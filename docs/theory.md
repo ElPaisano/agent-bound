@@ -30,13 +30,17 @@ We propose **agentic entropy** as that design-time signal.
 
 Let an agentic system be composed of `n` agents, where each agent is either:
 
-- An **LLM agent**: generative, high-entropy  
-- An **expert agent**: deterministic, low-entropy
+- An **LLM agent**: generative, high-entropy . Any LLM or GenAI based agent within the overall system. 
+- An **expert agent**: deterministic, low-entropy. This is essentially any sort of tool, from a linter to an API call to a web crawl, used within the system to perform some specific task. 
 
 Let:
 - `H_L` be the entropy contribution of a single LLM agent  
-- `H_E ≈ 0` for expert agents  
+- `H_E ≈ 0` for expert agents 
 - `h` be the number of LLM agents  
+
+> A remark on `H_E ≈ 0` 
+>
+> Note the use of `≈`. Recall that an expert agent is any deterministic component in the agentic system, like a linter or an API call or a web crawl, used within the system to perform some specific task. Now, if the expert agent is simply an "if-then-else" program, the entropy is `0` or very close. That being said, even an API call could be evaluated through the "entropy" lense, in that there is some degree of uncertainty in variables like API service uptime, internet connectivity, etc.. Therefore, there is some degree of entropy, even in expert agents. However, compared to any GenAI / LLM agent, the degree of entropy in all cases is miniscule (Note to self: prove this mathematically). So, for theory purposes, we can approximate for theory's sake as `H_E ≈ 0` for expert agents. That being said, in practice, we may wish to actually calculate entropy for expert systems so as to accurately calculate the overall agentic entropy for an actual system.
 
 We model:
 
