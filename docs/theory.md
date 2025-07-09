@@ -40,7 +40,7 @@ Let:
 
 > A remark on `H_E ≈ 0` 
 >
-> Note the use of `≈`. Recall that an expert agent is any deterministic component in the agentic system, like a linter or an API call or a web crawl, used within the system to perform some specific task. Now, if the expert agent is simply an "if-then-else" program, the entropy is `0` or very close. That being said, even an API call could be evaluated through the "entropy" lense, in that there is some degree of uncertainty in variables like API service uptime, internet connectivity, etc.. Therefore, there is some degree of entropy, even in expert agents. However, compared to any GenAI / LLM agent, the degree of entropy in all cases is miniscule (Note to self: prove this mathematically). So, for theory purposes, we can approximate for theory's sake as `H_E ≈ 0` for expert agents. That being said, in practice, we may wish to actually calculate entropy for expert systems so as to accurately calculate the overall agentic entropy for an actual system.
+> Note the use of `≈`. Recall that an expert agent is any deterministic component in the agentic system, like a linter or an API call or a web crawl, used within the system to perform some specific task. Now, if the expert agent is simply an "if-then-else" program, the entropy is `0` or very close. That being said, even an API call could be evaluated through the "entropy" lense, in that there is some degree of uncertainty in variables like API service uptime, internet connectivity, etc.. Therefore, there is some degree of entropy, even in expert agents. However, compared to any GenAI / LLM agent, the degree of entropy in all cases is miniscule. So, for theory purposes, we can approximate for theory's sake as `H_E ≈ 0` for expert agents. That being said, in practice, we may wish to actually calculate entropy for expert systems so as to accurately calculate the overall agentic entropy for an actual system.
 
 We model:
 
@@ -94,6 +94,185 @@ Entropy does not just accumulate linearly. It flows, amplifies, collapses, and l
 This leads to a second principle:
 
 > **System entropy is not just a function of agent count but a property of graph topology.**
+
+In other words, agentic entropy doesn’t just depend on how many LLMs you use. It depends where they are, and how they’re wired.
+
+### Simple Example
+
+Consider two systems:
+
+System A:
+
+```
+LLM → Tool → LLM
+```
+
+System B:
+
+```
+LLM → LLM → LLM
+```
+
+Assume each LLM contributes `7.5` entropy units.
+A simple tool contributes `≈ 0`.
+
+Then:
+
+System A Path Entropy:
+
+```
+H = 7.5 + 0 + 7.5 = 15.0
+```
+
+→ Potentially risky, but bounded
+
+System B Path Entropy:
+
+```
+H = 7.5 + 7.5 + 7.5 = 22.5
+```
+
+→ More risk, more drift, less interpretability
+
+Even though both systems use the same number of components, System A introduces a critical boundary via the tool.
+
+This illustrates a key design principle:
+
+- Risk lives in the graph structure, not just the part count.
+- AgentBound can trace these paths, flag entropy build-up, and suggest where to introduce constraints.
+
+### More Complex Examples
+
+#### 🟩 Example 1: Sandwich Architecture (Bounded Chain)
+
+```
+LLM → Validator → LLM
+```
+
+* First LLM generates an outline.
+* Validator enforces structure + tone.
+* Second LLM expands into final draft.
+
+Assume:
+
+* LLMs: `H = 7.5`
+* Validator: `H = 0.0`
+
+**Total Path Entropy** = `7.5 + 0.0 + 7.5 = 15.0`
+
+✅ Balanced creativity
+✅ Good structure
+🧯 Entropy is bounded before final output.
+
+---
+
+#### 🟥 Example 2: Reflective Loop (Unbounded Divergence)
+
+```
+LLM ↻ LLM (via Self-Reflection)
+```
+
+* Model plans, then reflects, then re-plans.
+* Loop continues based on past output.
+
+Per loop:
+
+* `H = 7.5 → 7.5 → 7.5 → …`
+
+**No hard boundary = unbounded entropy accumulation**
+
+⚠️ Small drift compounds
+⚠️ May hallucinate plans, break coherence
+🚨 Risk of planning collapse
+
+---
+
+#### 🟦 Example 3: Tool-Augmented Generation (Entropy Sink in Middle)
+
+```
+Planner LLM → Retrieval Tool → Generator LLM
+```
+
+* Planner chooses intent.
+* Retriever constrains facts.
+* Generator fills in details.
+
+Assume:
+
+* Each LLM = `H = 7.5`
+* Retrieval = `H ≈ 0.5` (API/tool)
+
+**Total Entropy** = `7.5 + 0.5 + 7.5 = 15.5`
+
+🧠 High output control
+✅ Retrieval reduces entropy from hallucination
+✅ Good balance between generativity and structure
+
+---
+
+#### 🟨 Example 4: Branch + Merge (Multi-path Variance)
+
+```
+          ┌─→ LLM A ──┐
+Router → ─┤           ├→ Merger Agent → Output
+          └─→ LLM B ──┘
+```
+
+* Two LLMs explore different outputs.
+* Merger agent selects final result.
+
+If:
+
+* `H(LLM A) = 7.5`, `H(LLM B) = 7.5`, `H(Merger) = 1.0`
+
+Total possible path entropy = `15.0`,
+But if only one branch is selected: `8.5`
+
+🌀 Parallel creativity with bounded exit
+✅ Can be tuned for more or less risk
+⚠️ Merger must be reliable or entropy leaks through
+
+---
+
+#### 🧠 Example 5: Overconnected “Agent Zoo”
+
+```
+LLM → LLM → LLM
+   ↘︎     ↘︎    ↘︎
+    Tool  Tool  Validator
+```
+
+* Freeform planning, rewriting, and summarizing
+* Occasional validator or tool use
+* No strong constraints
+
+Assume:
+
+* Each LLM = `H = 7.5`
+* Tools = `H = 0.5`
+
+Most paths are \~`20+` entropy
+Entropy leakage is **everywhere**.
+
+⚠️ Hard to debug
+⚠️ Hard to test
+⚠️ No clear control plane
+🚨 Common in exploratory agent projects
+
+---
+
+### 🧩 Design Insight
+
+These examples show that:
+
+> **Entropy is not just in what your system *is* — it’s in how your system *flows*.**
+
+A system with 3 LLMs can be:
+
+* Totally unbounded (LLM → LLM → LLM)
+* Or very safe (LLM → Tool → LLM)
+
+AgentBound gives you a way to **see** this, **quantify** it, and **respond before failure happens**.
 
 ---
 
