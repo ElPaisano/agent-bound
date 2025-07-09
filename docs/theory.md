@@ -1,4 +1,4 @@
-# AgentBound: Entropy as a Design-Time Signal in Agentic AI Systems
+# Entropy as a Design-Time Signal in Agentic AI Systems
 
  * [Abstract](#abstract)
  * [1. Introduction](#1-introduction)
@@ -569,7 +569,7 @@ Path entropy = 21.0
 
 ## Code + Docs
 
-...
+See the [README](/README.md) for information on how to run the toy example [`agentbound.py`](\agentbound.py).
 
 ---
 
