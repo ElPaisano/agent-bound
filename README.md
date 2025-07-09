@@ -1,6 +1,6 @@
 # AgentBound 
 
-This is a minimal proof-of-concept for **AgentBound** — an entropy analyzer for agentic AI systems.
+This is a minimal proof-of-concept for **AgentBound**, an **agentic entropy** analyzer for agentic AI systems.
 
 It reads a YAML-defined agent pipeline and computes path-level entropy across the graph, flagging high-entropy or risky branches before you deploy.
 
@@ -8,7 +8,7 @@ It reads a YAML-defined agent pipeline and computes path-level entropy across th
 
 ## Theory 
 
-For a deep-dive into the theory of agentic entropy and its applications, see [/docs/theory.md](/docs/theory.md).
+For a deep-dive into the theory of **agentic entropy** and its applications, see [/docs/theory.md](/docs/theory.md).
 
 If you just want a short explanation of why the idea is practically useful, see the [Explain it to me like I'm 5 doc](/docs/eitmli5.md).
 
