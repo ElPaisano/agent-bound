@@ -2,113 +2,225 @@
 
 ## Abstract
 
-Agentic AI systems — composed of LLMs, retrieval tools, validators, planners, and more — are becoming the new norm in applied AI. Yet while we have tools to measure model performance after deployment, we lack methods to reason about the *system-level behavior* of these multi-agent pipelines *before* they run.
+Agentic AI systems, composed of LLMs, retrieval tools, validators, planners, and more, are rapidly becoming the norm in applied AI. Yet while we have tools to measure performance after deployment, we lack methods to reason about the *behavioral uncertainty* of these systems *before* they run.
 
-This paper introduces a simple, composable framework for estimating and analyzing **entropy** in hybrid agentic systems. We model entropy as a function of agent type (generative vs expert) and dependency structure. We argue that entropy is a useful proxy for *output variance, unpredictability, and failure risk*, and can serve as a design-time signal for safety, explainability, and control. We also introduce AgentBound, an open-source prototype for estimating and visualizing entropy in agent graphs.
+This paper introduces a composable framework for estimating and analyzing **agentic entropy**, a measure of unpredictability and drift across agent graphs. We model entropy as a function of agent type (generative vs expert), prompt structure, and graph topology. We argue that entropy is a useful design-time signal for safety, explainability, and control. We propose **bounded generativity** as a new design principle for AI systems.
+
+We also introduce **AgentBound**, an open-source prototype for measuring entropy across agent pipelines. It is both a tool and an architectural lens, helping teams build safer, more predictable agentic systems by design.
 
 ## 1. Introduction
 
-Modern LLM-based systems are no longer single prompts or models — they are **compositions** of LLMs, tools, retrieval chains, rewriters, evaluators, and validators. We refer to these as **agentic systems**.
+Modern LLM systems are no longer single prompts or models. Rather, they are **agentic compositions**: chains and graphs of LLMs, tools, validators, retrievers, planners, and memory modules.
 
-These systems are inherently *emergent* and *non-linear*. As complexity increases, so does unpredictability. Yet our existing evaluation tools are almost entirely **post hoc**: they tell us *what happened*, not *what is likely to happen*.
+These systems are powerful, but often **unpredictable**. As they grow in complexity, they exhibit:
+- Hallucination drift
+- Planning instability
+- Unexplainable failures
+- Divergence between versions
 
-What’s missing is a **design-time signal** — something that helps us reason about how an agentic system will behave *before* we run it.
+Yet existing tools for tracing, evals, regression tests all work **after the fact**.
 
-We propose **entropy** as that signal.
+What’s missing is a way to reason about *how chaotic or stable a system might be*, before we run it.
+
+We propose **agentic entropy** as that design-time signal.
+
+---
 
 ## 2. The Entropy Control Hypothesis
 
 Let an agentic system be composed of `n` agents, where each agent is either:
 
-- An **LLM agent** (probabilistic, high-entropy)
-- An **expert agent** (deterministic, low-entropy)
+- An **LLM agent**: generative, high-entropy  
+- An **expert agent**: deterministic, low-entropy
 
 Let:
-- `H_L` be the estimated entropy contribution of a single LLM agent  
-- `H_E` for expert agents  
+- `H_L` be the entropy contribution of a single LLM agent  
+- `H_E ≈ 0` for expert agents  
 - `h` be the number of LLM agents  
 
-We model system-level entropy as:
+We model:
 
 ```
-H_system ≈ h * H_L
+
+H\_system ≈ h \* H\_L
+
 ```
 
-This gives rise to a key insight:
+This gives rise to a core principle:
 
-> **The more LLM agents you have — and the fewer constraints you place around them — the more variable, unbounded, and potentially unsafe your system becomes.**
+> **The more generative agents you use — and the fewer constraints you place on them — the more unbounded, unstable, and hard-to-explain your system becomes.**
 
-## 3. Dependency Structure Matters
+---
 
-Agent composition isn’t just about what types of agents you use, but *how they depend on each other*. We categorize dependency structures as follows:
+## 3. Prompt Entropy and System Drift
 
-| Structure            | Example               | Entropy Effect              |
-|----------------------|------------------------|------------------------------|
-| LLM → Expert         | Generator → Validator  | Preemptive entropy bounding  |
-| Expert → LLM         | Tool → Generator       | Post-hoc containment         |
-| LLM → LLM            | Generator → Rewriter   | Entropy amplification        |
-| Expert ⊥ Expert       | Parallel tools         | Zero or bounded entropy      |
+While LLMs introduce entropy, they do not do so alone.
 
-System entropy is thus a function not just of agent count, but of **dependency graph topology**.
+> **Prompts with vague, underspecified, or overly open-ended language induce higher-entropy output distributions.**
 
-## 4. Toward an Entropy-Aware Design Tool
+We call this **prompt entropy**, and treat it as an upstream contributor to system-level entropy.
 
-We introduce **AgentBound** for:
+Let:
+- `E(prompt)` be the entropy induced by a given prompt
 
-- Estimating entropy of agent components
-- Building dependency graphs
-- Visualizing entropy propagation
-- Flagging high-entropy regions or unconstrained flows
+Then:
 
-AgentBound includes both:
-- A symbolic estimator (based on agent type and graph structure)
-- A sampling-based estimator (for LLM entropy using output diversity or logprobs)
+```
 
-## 5. Applications
+E(agent) = f(model, E(prompt), graph context)
 
-This framework enables new capabilities across AI system design:
+```
 
-- **Design-time safety audits**: Identify high-risk branches before deployment
-- **Bounded generation**: Use entropy as a constraint signal
-- **Eval planning**: Compare system versions by entropy delta
-- **Autonomous agent debugging**: Detect instability loops
-- **Enterprise AI compliance**: Prove behavior is constrained by design
+This lets us identify unstable behaviors *at the entry point* of a system and treat prompt engineering as entropy shaping, not just output hacking.
 
-## 6. Limitations and Future Work
+---
 
-This framework is intentionally simple — it treats entropy as a proxy for variance, not a perfect model of risk. Future extensions could include:
+## 4. Graph Structure and Entropy Propagation
 
-- Empirical entropy profiling from logged runs  
-- Path-based entropy propagation modeling  
-- Integration with planning and reflection agents  
-- Formal bounds on graph-level entropy accumulation
+Entropy does not just accumulate linearly. It flows, amplifies, collapses, and loops through agent graphs.
 
-## 7. Conclusion
+| Dependency Type     | Example                   | Effect                       |
+|---------------------|---------------------------|------------------------------|
+| LLM → Expert        | Generator → Validator     | Entropy bounded downstream   |
+| Expert → LLM        | Tool → Generator          | Safe context injection       |
+| LLM → LLM           | Generator → Rewriter      | Entropy amplification        |
+| LLM ↻ LLM           | Reflective loops          | Compounding, divergence risk |
+| Expert ⊥ Expert     | Parallel tools            | Minimal entropy contribution |
 
-As we build increasingly complex, open-ended AI systems, we must develop tools to **reason about their behavior before they act**. Entropy is not just a statistical property — it’s a **systems signal**. By understanding how it flows, amplifies, and can be bounded, we can build safer, more interpretable, and more controllable AI.
+This leads to a second principle:
 
-**AgentBound is one step toward that vision.**
+> **System entropy is not just a function of agent count but a property of graph topology.**
+
+---
+
+## 5. Bounding Generativity Through Design
+
+To manage entropy, we propose **bounded generativity**:  
+Designing systems that allow creativity where needed, but **constrain it structurally and symbolically.**
+
+Techniques include:
+- **Entropy sandwiches**: LLM → validator → LLM
+- **Budgeted paths**: Max `H` per execution branch
+- **Parallel generation with merge agents**
+- **Symbolic compression**: Mapping output into controlled vocabularies
+
+Symbolic compression, a proposed "translation layer", can:
+- Reduce token entropy
+- Constrain LLM outputs into finite symbolic spaces
+- Enable deterministic post-processing
+
+Together, these tools make entropy not just visible, but **shapable.**
+
+---
+
+## 6. AgentBound: The Tool
+
+**AgentBound** is a Python-based toolkit for entropy-aware design. It provides:
+
+- CLI (`agentbound.py --analyze pipeline.yaml`)
+- Entropy estimation per agent and path
+- Graph visualization with heatmaps
+- YAML-based pipeline descriptions
+- Static + sampling-based entropy calculators
+
+It is designed to:
+- Run before deployment
+- Integrate with LangGraph, LangChain, DSPy, or custom DAGs
+- Support both research and enterprise pipelines
+
+---
+
+## 7. Applications
+
+| Use Case                        | Value Add                               |
+|--------------------------------|------------------------------------------|
+| Design-time safety audits      | Find high-risk paths before deploy       |
+| Prompt + system co-design      | Align prompt entropy with system needs   |
+| Eval pipeline planning         | Add entropy deltas to eval strategy      |
+| Agent debugging                | Explain drift or instability             |
+| CI/CD safety integration       | Fail builds that exceed entropy budget   |
+| Enterprise AI compliance       | Show design-time constraint and traceability |
+
+---
+
+## 8. Limitations and Future Work
+
+- Current entropy estimates are coarse (sum-based, not probabilistic models)
+- Symbolic entropy modeling and semantic diffing are in early stages
+- Runtime entropy feedback loop not yet built
+
+Planned extensions:
+- Entropy diffing between versions
+- Symbolic compression modules
+- Entropy-aware planner agents
+- Real-time entropy modulator agent
+- AgentBound plugins for LangGraph and Weave
+
+---
+
+## 9. Axioms of Agentic Entropy
+
+1. **All agentic systems produce entropy.**  
+2. **Entropy is composable across system structure.**  
+3. **Entropy flows along the agent graph.**  
+4. **System entropy must be bounded for safety.**  
+5. **Entropy is a proxy for behavioral risk.**  
+6. **Useful systems live near the edge of entropy.**  
+7. **Systems can be entropy-aware.**  
+8. **Entropy differentials explain system drift.**  
+9. **Entropy can be analyzed statically or dynamically.**  
+10. **Bounded generativity is necessary for control.**  
+11. **Prompt entropy is upstream of system entropy.**
+
+---
+
+## 10. Conclusion
+
+As AI systems become more open-ended, agentic, and autonomous, we need **new tools to reason about their behavior structurally, not just statistically.**
+
+**Agentic entropy** provides such a lens and **AgentBound** offers the first operational tool to measure, visualize, and constrain generative chaos *before it happens.*
+
+This isn’t just an eval framework. It’s the beginning of a **design methodology for generative cognition.**
+
+---
 
 ## Appendix: Toy Example
 
 Given:
-- A pipeline with an LLM generator (`H = 7.5`)  
-- Followed by a rule-based validator (`H = 0`)  
+- LLM Generator: `H = 7.5`  
+- Expert Validator: `H = 0.0`
 
-Then:
-- `H_system = 7.5`  
-- If the validator is removed and another LLM is added: `H = 15.0`  
+```
 
-Entropy becomes a **unit of reasoning**, not just a metric — and that’s the core idea behind AgentBound.
+Path entropy = 7.5
 
-## Code samples
+```
 
-_(To be expanded in future drafts)_
+Add a Rewriter LLM (`H = 6.0`):
 
-## References
+```
 
-_(To be expanded in future drafts)_
+Path entropy = 13.5
+
+```
+
+Remove the validator:
+
+```
+
+Path entropy = 21.0
+
+```
+
+---
+
+## Code + Docs
+
+...
+
+---
 
 ## License
 
 MIT
+
