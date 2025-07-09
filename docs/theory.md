@@ -19,12 +19,12 @@
    * [8. Limitations and Future Work](#8-limitations-and-future-work)
    * [9. Axioms of Agentic Entropy](#9-axioms-of-agentic-entropy)
    * [10. Conclusion](#10-conclusion)
-   * [11. Environmental Entropy and Interface Risk](#11-environmental-entropy-and-interface-risk)
+   * [Appendix A: Environmental Entropy and Interface Risk](#environmental-entropy-and-interface-risk)
       + [What is Environmental Entropy?](#what-is-environmental-entropy)
       + [Relationship to Expert Agent Entropy](#relationship-to-expert-agent-entropy)
       + [Modeling Environmental Entropy in AgentBound](#modeling-environmental-entropy-in-agentbound)
-   * [Appendix: Toy Example](#appendix-toy-example)
-   * [Code + Docs](#code-docs)
+   * [Appendix B: Toy Example](#appendix-toy-example)
+   * [Appendix C: Code + Docs](#code-docs)
    * [License](#license)
 
 
@@ -395,7 +395,7 @@ As AI systems become more open-ended, agentic, and autonomous, we need **new too
 
 This isn’t just an eval framework. It’s the beginning of a **design methodology for generative cognition.**
 
-## 11. Environmental Entropy and Interface Risk
+## Environmental Entropy and Interface Risk
 
 Agentic systems do not exist in a vacuum. They live within, and interact with, an **external environment** — made up of users, APIs, retrieval sources, hardware sensors, and other systems. These interactions introduce **environmental entropy**: uncertainty and variability that enters the system from the outside.
 
