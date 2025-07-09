@@ -8,7 +8,9 @@ It reads a YAML-defined agent pipeline and computes path-level entropy across th
 
 ## Theory 
 
-For a deep-dive into the theory of agentic entropy and its applications, see [theory.md](/theory.md).
+For a deep-dive into the theory of agentic entropy and its applications, see [/docs/theory.md](/docs/theory.md).
+
+If you just want a short explanation of why the idea is practically useful, see the [Explain it to me like I'm 5 doc](/docs/eitmli5.md).
 
 ## 🔧 What It Does
 
