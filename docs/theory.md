@@ -1,30 +1,21 @@
 # AgentBound: Entropy as a Design-Time Signal in Agentic AI Systems
 
-   * [Abstract](#abstract)
+ * [Abstract](#abstract)
    * [1. Introduction](#1-introduction)
    * [2. The Entropy Control Hypothesis](#2-the-entropy-control-hypothesis)
    * [3. Prompt Entropy and System Drift](#3-prompt-entropy-and-system-drift)
    * [4. Graph Structure and Entropy Propagation](#4-graph-structure-and-entropy-propagation)
-      + [Simple Example](#simple-example)
-      + [More Complex Examples](#more-complex-examples)
-         - [🟩 Example 1: Sandwich Architecture (Bounded Chain)](#-example-1-sandwich-architecture-bounded-chain)
-         - [🟥 Example 2: Reflective Loop (Unbounded Divergence)](#-example-2-reflective-loop-unbounded-divergence)
-         - [🟦 Example 3: Tool-Augmented Generation (Entropy Sink in Middle)](#-example-3-tool-augmented-generation-entropy-sink-in-middle)
-         - [🟨 Example 4: Branch + Merge (Multi-path Variance)](#-example-4-branch-merge-multi-path-variance)
-         - [🧠 Example 5: Overconnected “Agent Zoo”](#-example-5-overconnected-agent-zoo)
-      + [🧩 Design Insight](#-design-insight)
    * [5. Bounding Generativity Through Design](#5-bounding-generativity-through-design)
    * [6. AgentBound: The Tool](#6-agentbound-the-tool)
    * [7. Applications](#7-applications)
    * [8. Limitations and Future Work](#8-limitations-and-future-work)
    * [9. Axioms of Agentic Entropy](#9-axioms-of-agentic-entropy)
    * [10. Conclusion](#10-conclusion)
-   * [Appendix A: Environmental Entropy and Interface Risk](#environmental-entropy-and-interface-risk)
-      + [What is Environmental Entropy?](#what-is-environmental-entropy)
-      + [Relationship to Expert Agent Entropy](#relationship-to-expert-agent-entropy)
-      + [Modeling Environmental Entropy in AgentBound](#modeling-environmental-entropy-in-agentbound)
-   * [Appendix B: Toy Example](#appendix-toy-example)
-   * [Appendix C: Code + Docs](#code-docs)
+   * [Appendix](#appendix)
+      + [Environmental Entropy and Interface Risk](#environmental-entropy-and-interface-risk)
+      + [Entropy Propagation: Dependency vs Independence](#entropy-propagation-dependency-vs-independence)
+      + [Toy Example](#toy-example)
+   * [Code + Docs](#code-docs)
    * [License](#license)
 
 
@@ -384,6 +375,7 @@ Planned extensions:
 11. **Prompt entropy is upstream of system entropy.**
 12: **Environmental entropy is an upstream driver of agentic instability.** Inputs from the environment (users, APIs, sensors) may introduce unbounded variability unless explicitly constrained.
 13: **Induced entropy can arise in deterministic components like tools (expert systems).** An agent's effective entropy may increase (induced entropy) if it receives high-entropy inputs (for example, a high-entropy prompt), even if its internal logic is stable. Agentic systems must account for entropy transmission, not just local generation.
+14: **Entropy compounds multiplicatively through dependency.** When one agent depends on the output of another, the uncertainty of the system grows as the product of their entropies. In contrast, independent agents contribute entropy additively.
 
 ---
 
@@ -395,11 +387,14 @@ As AI systems become more open-ended, agentic, and autonomous, we need **new too
 
 This isn’t just an eval framework. It’s the beginning of a **design methodology for generative cognition.**
 
-## Environmental Entropy and Interface Risk
+
+## Appendix
+
+### Environmental Entropy and Interface Risk
 
 Agentic systems do not exist in a vacuum. They live within, and interact with, an **external environment** — made up of users, APIs, retrieval sources, hardware sensors, and other systems. These interactions introduce **environmental entropy**: uncertainty and variability that enters the system from the outside.
 
-### What is Environmental Entropy?
+#### What is Environmental Entropy?
 
 **Environmental entropy** is the unpredictability or variability of external inputs or dependencies. It includes:
 
@@ -414,7 +409,7 @@ Environmental entropy is **not under direct control** of the system designer. Ye
 
 ---
 
-### Relationship to Expert Agent Entropy
+#### Relationship to Expert Agent Entropy
 
 It's tempting to conflate these: expert systems often **interface with the environment**.
 
@@ -450,7 +445,7 @@ This leads us to the idea of **induced entropy**:
 
 > Expert agents inherit entropy from their inputs. Even if the logic is fixed, the result may vary widely.
 
-### Modeling Environmental Entropy in AgentBound
+#### Modeling Environmental Entropy in AgentBound
 
 Environmental entropy can be treated as:
 
@@ -464,9 +459,85 @@ This allows us to:
 - Quantify risk propagation from unstable inputs
 - Recommend boundaries (validators, compressors) after entropy-heavy entry points
 
+### Entropy Propagation: Dependency vs Independence
+
+Not all agents in a path contribute entropy in the same way. The **relationship between agents** determines how their uncertainties combine.
+
 ---
 
-## Appendix: Toy Example
+#### 🤝 Dependent Agents (Conditional, Sequential)
+
+> Agent A **depends on** the output of Agent B in order to function.
+
+Example:
+- B = API call that fetches data  
+- A = LLM that generates a description using that data
+
+Because B conditions A:
+
+```
+
+H\_combined = H(A) × H(B)
+
+```
+
+> **Why?**
+>
+> Each possible output of B introduces a **full distribution** of possible outputs for A
+> The total system space grows **combinatorially**
+
+---
+
+#### 🔀 Independent Agents (Parallel, Merged)
+
+> Agents A and B operate independently, without influencing each other directly.
+
+Example:
+- A = LLM that generates a tagline  
+- B = Tool that parses last month’s analytics
+
+Because they don’t condition each other:
+
+```
+
+H\_combined = H(A) + H(B)
+
+```
+
+This follows classic information theory: uncertainty is **additive** across uncorrelated sources.
+
+---
+
+#### 💥 Implication for System Design
+
+- **Entropy compounds faster** through **dependent chains**
+- **Independent branches** grow risk linearly
+- AgentBound must **model edge relationships** to get accurate path entropy estimates
+
+---
+
+#### 📐 Formal Rule
+
+For each edge between agents A and B:
+
+- If A depends on B:  
+  `H_total += H(A) × H(B)`
+
+- If A is independent of B:  
+  `H_total += H(A) + H(B)`
+
+- If B constrains A (validator):  
+  apply bounding operator (e.g., `min`, `clamp`, or collapse to 0)
+
+---
+
+#### 🧪 Axiom 15: Multiplicative Entropy via Dependency
+
+> **Axiom 15: Entropy compounds multiplicatively through dependency.**  
+> When one agent depends on the output of another, the uncertainty of the system grows as the product of their entropies. In contrast, independent agents contribute entropy additively.
+
+
+### Toy Example
 
 Given:
 - LLM Generator: `H = 7.5`  
