@@ -1,5 +1,33 @@
 # AgentBound: Entropy as a Design-Time Signal in Agentic AI Systems
 
+   * [Abstract](#abstract)
+   * [1. Introduction](#1-introduction)
+   * [2. The Entropy Control Hypothesis](#2-the-entropy-control-hypothesis)
+   * [3. Prompt Entropy and System Drift](#3-prompt-entropy-and-system-drift)
+   * [4. Graph Structure and Entropy Propagation](#4-graph-structure-and-entropy-propagation)
+      + [Simple Example](#simple-example)
+      + [More Complex Examples](#more-complex-examples)
+         - [🟩 Example 1: Sandwich Architecture (Bounded Chain)](#-example-1-sandwich-architecture-bounded-chain)
+         - [🟥 Example 2: Reflective Loop (Unbounded Divergence)](#-example-2-reflective-loop-unbounded-divergence)
+         - [🟦 Example 3: Tool-Augmented Generation (Entropy Sink in Middle)](#-example-3-tool-augmented-generation-entropy-sink-in-middle)
+         - [🟨 Example 4: Branch + Merge (Multi-path Variance)](#-example-4-branch-merge-multi-path-variance)
+         - [🧠 Example 5: Overconnected “Agent Zoo”](#-example-5-overconnected-agent-zoo)
+      + [🧩 Design Insight](#-design-insight)
+   * [5. Bounding Generativity Through Design](#5-bounding-generativity-through-design)
+   * [6. AgentBound: The Tool](#6-agentbound-the-tool)
+   * [7. Applications](#7-applications)
+   * [8. Limitations and Future Work](#8-limitations-and-future-work)
+   * [9. Axioms of Agentic Entropy](#9-axioms-of-agentic-entropy)
+   * [10. Conclusion](#10-conclusion)
+   * [11. Environmental Entropy and Interface Risk](#11-environmental-entropy-and-interface-risk)
+      + [What is Environmental Entropy?](#what-is-environmental-entropy)
+      + [Relationship to Expert Agent Entropy](#relationship-to-expert-agent-entropy)
+      + [Modeling Environmental Entropy in AgentBound](#modeling-environmental-entropy-in-agentbound)
+   * [Appendix: Toy Example](#appendix-toy-example)
+   * [Code + Docs](#code-docs)
+   * [License](#license)
+
+
 ## Abstract
 
 Agentic AI systems, composed of LLMs, retrieval tools, validators, planners, and more, are rapidly becoming the norm in applied AI. Yet while we have tools to measure performance after deployment, we lack methods to reason about the *behavioral uncertainty* of these systems *before* they run.
@@ -354,10 +382,8 @@ Planned extensions:
 9. **Entropy can be analyzed statically or dynamically.**  
 10. **Bounded generativity is necessary for control.**  
 11. **Prompt entropy is upstream of system entropy.**
-12: **Environmental entropy is an upstream driver of agentic instability.**
-Inputs from the environment (users, APIs, sensors) may introduce unbounded variability unless explicitly constrained.
-13: **Induced entropy can arise in deterministic components like tools (expert systems).**  
-An agent's effective entropy may increase (induced entropy) if it receives high-entropy inputs (for example, a high-entropy prompt), even if its internal logic is stable. Agentic systems must account for entropy transmission, not just local generation.
+12: **Environmental entropy is an upstream driver of agentic instability.** Inputs from the environment (users, APIs, sensors) may introduce unbounded variability unless explicitly constrained.
+13: **Induced entropy can arise in deterministic components like tools (expert systems).** An agent's effective entropy may increase (induced entropy) if it receives high-entropy inputs (for example, a high-entropy prompt), even if its internal logic is stable. Agentic systems must account for entropy transmission, not just local generation.
 
 ---
 
