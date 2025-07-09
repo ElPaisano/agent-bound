@@ -354,6 +354,10 @@ Planned extensions:
 9. **Entropy can be analyzed statically or dynamically.**  
 10. **Bounded generativity is necessary for control.**  
 11. **Prompt entropy is upstream of system entropy.**
+12: **Environmental entropy is an upstream driver of agentic instability.**
+Inputs from the environment (users, APIs, sensors) may introduce unbounded variability unless explicitly constrained.
+13: **Induced entropy can arise in deterministic components like tools (expert systems).**  
+An agent's effective entropy may increase (induced entropy) if it receives high-entropy inputs (for example, a high-entropy prompt), even if its internal logic is stable. Agentic systems must account for entropy transmission, not just local generation.
 
 ---
 
@@ -364,6 +368,75 @@ As AI systems become more open-ended, agentic, and autonomous, we need **new too
 **Agentic entropy** provides such a lens and **AgentBound** offers the first operational tool to measure, visualize, and constrain generative chaos *before it happens.*
 
 This isn’t just an eval framework. It’s the beginning of a **design methodology for generative cognition.**
+
+## 11. Environmental Entropy and Interface Risk
+
+Agentic systems do not exist in a vacuum. They live within, and interact with, an **external environment** — made up of users, APIs, retrieval sources, hardware sensors, and other systems. These interactions introduce **environmental entropy**: uncertainty and variability that enters the system from the outside.
+
+### What is Environmental Entropy?
+
+**Environmental entropy** is the unpredictability or variability of external inputs or dependencies. It includes:
+
+| Source          | Example                  | Entropy Factors                     |
+|-----------------|--------------------------|-------------------------------------|
+| User Input      | Natural language prompt  | Ambiguity, open-endedness           |
+| API Response    | Weather API, search engine | Uptime, schema drift, latency     |
+| Retrieved Content | RAG or vector DB results | Relevance, ranking noise           |
+| Sensor Data     | Audio, video, logs       | Noise, frame drops, signal degradation |
+
+Environmental entropy is **not under direct control** of the system designer. Yet it has a profound effect on downstream behavior.
+
+---
+
+### Relationship to Expert Agent Entropy
+
+It's tempting to conflate these: expert systems often **interface with the environment**.
+
+But they are distinct:
+
+|                      | Expert Agent Entropy     | Environmental Entropy        |
+|----------------------|--------------------------|------------------------------|
+| Location             | Inside system            | Outside system               |
+| Origin               | Conditional logic, retries | Real-world inputs         |
+| Controllability      | High                     | Low                          |
+| Can be zero?         | Often approximated as ≈ 0 | Rarely                      |
+
+However:
+
+> **Expert systems can act as conduits for environmental entropy.**
+
+Example:
+
+```yaml
+Tool Agent: Weather API Call
+H_internal = 0.1
+H_induced = 5.0  # Unstable API response
+```
+
+So actual entropy contribution:
+
+```
+H(Tool Agent) = H_internal + H_induced = 5.1
+```
+
+While the code is deterministic, the data is not.
+This leads us to the idea of **induced entropy**:
+
+> Expert agents inherit entropy from their inputs. Even if the logic is fixed, the result may vary widely.
+
+### Modeling Environmental Entropy in AgentBound
+
+Environmental entropy can be treated as:
+
+- An upstream node in the systems graph (H = 5.0 from user input)
+- Induced entropy in overall prompt entropy
+- A factor in tool-induced (expert systems) uncertainty
+
+This allows us to:
+
+- Trace entropy from outside the system
+- Quantify risk propagation from unstable inputs
+- Recommend boundaries (validators, compressors) after entropy-heavy entry points
 
 ---
 
