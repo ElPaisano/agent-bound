@@ -42,7 +42,7 @@ We model:
 
 ```
 
-H\_system ≈ h \* H\_L
+H_system ≈ h * H_L
 
 ```
 
