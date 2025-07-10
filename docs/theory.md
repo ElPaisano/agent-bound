@@ -43,7 +43,7 @@ What’s missing is a way to reason about *how chaotic or stable a system might 
 
 We propose **agentic entropy** as that design-time signal.
 
----
+
 
 ## 2. The Entropy Control Hypothesis
 
@@ -73,7 +73,7 @@ This gives rise to a core principle:
 
 > **The more generative agents you use — and the fewer constraints you place on them — the more unbounded, unstable, and hard-to-explain your system becomes.**
 
----
+
 
 ## 3. Prompt Entropy and System Drift
 
@@ -96,7 +96,7 @@ E(agent) = f(model, E(prompt), graph context)
 
 This lets us identify unstable behaviors *at the entry point* of a system and treat prompt engineering as entropy shaping, not just output hacking.
 
----
+
 
 ## 4. Graph Structure and Entropy Propagation
 
@@ -183,7 +183,7 @@ Assume:
 ✅ Good structure
 🧯 Entropy is bounded before final output.
 
----
+
 
 #### 🟥 Example 2: Reflective Loop (Unbounded Divergence)
 
@@ -204,7 +204,7 @@ Per loop:
 ⚠️ May hallucinate plans, break coherence
 🚨 Risk of planning collapse
 
----
+
 
 #### 🟦 Example 3: Tool-Augmented Generation (Entropy Sink in Middle)
 
@@ -227,7 +227,7 @@ Assume:
 ✅ Retrieval reduces entropy from hallucination
 ✅ Good balance between generativity and structure
 
----
+
 
 #### 🟨 Example 4: Branch + Merge (Multi-path Variance)
 
@@ -251,7 +251,7 @@ But if only one branch is selected: `8.5`
 ✅ Can be tuned for more or less risk
 ⚠️ Merger must be reliable or entropy leaks through
 
----
+
 
 #### 🧠 Example 5: Overconnected “Agent Zoo”
 
@@ -278,7 +278,7 @@ Entropy leakage is **everywhere**.
 ⚠️ No clear control plane
 🚨 Common in exploratory agent projects
 
----
+
 
 ### 🧩 Design Insight
 
@@ -293,7 +293,7 @@ A system with 3 LLMs can be:
 
 AgentBound gives you a way to **see** this, **quantify** it, and **respond before failure happens**.
 
----
+
 
 ## 5. Bounding Generativity Through Design
 
@@ -313,7 +313,7 @@ Symbolic compression, a proposed "translation layer", can:
 
 Together, these tools make entropy not just visible, but **shapable.**
 
----
+
 
 ## 6. AgentBound: The Tool
 
@@ -330,7 +330,7 @@ It is designed to:
 - Integrate with LangGraph, LangChain, DSPy, or custom DAGs
 - Support both research and enterprise pipelines
 
----
+
 
 ## 7. Applications
 
@@ -343,7 +343,7 @@ It is designed to:
 | CI/CD safety integration       | Fail builds that exceed entropy budget   |
 | Enterprise AI compliance       | Show design-time constraint and traceability |
 
----
+
 
 ## 8. Limitations and Future Work
 
@@ -358,7 +358,7 @@ Planned extensions:
 - Real-time entropy modulator agent
 - AgentBound plugins for LangGraph and Weave
 
----
+
 
 ## 9. Axioms of Agentic Entropy
 
@@ -377,7 +377,7 @@ Planned extensions:
 13: **Induced entropy can arise in deterministic components like tools (expert systems).** An agent's effective entropy may increase (induced entropy) if it receives high-entropy inputs (for example, a high-entropy prompt), even if its internal logic is stable. Agentic systems must account for entropy transmission, not just local generation.
 14: **Entropy compounds multiplicatively through dependency.** When one agent depends on the output of another, the uncertainty of the system grows as the product of their entropies. In contrast, independent agents contribute entropy additively.
 
----
+
 
 ## 10. Conclusion
 
@@ -389,6 +389,121 @@ This isn’t just an eval framework. It’s the beginning of a **design methodol
 
 
 ## Appendix
+
+### Approximating Entropy in Practice
+
+The AgentBound framework proposes a composable theory of agentic entropy, modeling unpredictability based on agent type, dependency structure, and environmental interaction. But to make this theory actionable, we must approximate entropy **in practice** for both LLM-based agents and expert systems.
+
+This section outlines current best methods for estimating entropy per agent, along with tradeoffs and implementation suggestions.
+
+#### 11.1 Entropy Estimation for LLM / GenAI Agents
+
+##### A. Logprob-Based Token Entropy
+
+**Method**: Use the model’s `logprobs` API to compute the Shannon entropy across top-k tokens at each step.
+
+```
+H = -\sum p_i \cdot \log_2(p_i)
+```
+
+**Pros**:
+- Fast
+- API-supported by OpenAI and others
+
+**Cons**:
+- Tokenization-sensitive
+- May not capture semantic diversity
+
+##### B. Output Sampling Entropy
+
+**Method**: Sample N completions from the same prompt and compute distributional or structural divergence (e.g., edit distance, clustering).
+
+**Pros**:
+- Model-agnostic
+- Captures semantic variability
+
+**Cons**:
+- Requires many samples
+- Higher cost and compute
+
+##### C. Dropout-Based Monte Carlo Entropy
+
+**Method**: For models supporting dropout-at-inference, run N forward passes and calculate variance or entropy across outputs.
+
+**Pros**:
+- Bayesian-style uncertainty
+- Good for safety-critical use cases
+
+**Cons**:
+- Requires custom model setup
+- Less interpretable in language terms
+
+##### D. Prompt-Driven Entropy Priors
+
+**Method**: Use known heuristics (or LLM classifiers) to estimate entropy induced by prompt style (e.g., open-ended vs structured).
+
+**Pros**:
+- Useful at design-time
+- Cheap and fast
+
+**Cons**:
+- Coarse-grained
+- Not reliable without fine-tuning
+
+#### Entropy Estimation for Expert Systems
+
+While the theory assumes \( H_E \approx 0 \), real-world expert agents may exhibit **induced entropy** due to environmental variability, branching logic, or retrieval fuzziness.
+
+##### A. Rule-Based Logic (Linters, Heuristics)
+
+**Method**: Count logical branches (e.g., if/else paths), use complexity scores.
+
+```
+H \approx \log_2(N_{paths})
+```
+
+**Tools**:
+- McCabe complexity
+- Static analysis linters
+
+##### B. Retrieval Engines / Search APIs
+
+**Method**:
+- Use embedding distance spread or doc rank entropy
+- Estimate entropy over top-k result scores
+
+**Useful Metrics**:
+- Mean doc overlap between queries
+- Entropy of attention over documents
+
+##### C. External APIs (Weather, Stock, Vendor, etc.)
+
+**Method**: Heuristic model based on:
+- Uptime/SLA
+- Latency variance
+- Schema stability
+- Rate of unexpected failures
+
+```
+H_{API} = w_1(1 - \text{Uptime}) + w_2(\text{Latency Jitter}) + w_3(\text{Schema Drift}) + ...
+```
+
+##### D. Format Validators and Toolchains
+
+**Method**:
+- Use deterministic unit tests over diverse inputs
+- Track rate of format rejection or variability in edge behavior
+  
+#### Toward a Unified Agent Entropy Estimator
+
+AgentBound will support both **static estimators** (based on structure and heuristics) and **sampling-based estimators** (based on actual execution).
+
+Future tooling will include:
+- A YAML schema for agent entropy profiling
+- CLI flags to run `--estimate-entropy` using prompt + model samples
+- Integration with LangGraph / LangChain traces to auto-score entropy
+
+Entropy estimation bridges theory and engineering. It transforms agentic entropy from abstract concept to measurable property—enabling teams to tune, validate, and deploy AI systems with structural awareness of their uncertainty.
 
 ### Environmental Entropy and Interface Risk
 
@@ -407,7 +522,7 @@ Agentic systems do not exist in a vacuum. They live within, and interact with, a
 
 Environmental entropy is **not under direct control** of the system designer. Yet it has a profound effect on downstream behavior.
 
----
+
 
 #### Relationship to Expert Agent Entropy
 
@@ -463,7 +578,7 @@ This allows us to:
 
 Not all agents in a path contribute entropy in the same way. The **relationship between agents** determines how their uncertainties combine.
 
----
+
 
 #### 🤝 Dependent Agents (Conditional, Sequential)
 
@@ -486,7 +601,7 @@ H\_combined = H(A) × H(B)
 > Each possible output of B introduces a **full distribution** of possible outputs for A
 > The total system space grows **combinatorially**
 
----
+
 
 #### 🔀 Independent Agents (Parallel, Merged)
 
@@ -506,7 +621,7 @@ H\_combined = H(A) + H(B)
 
 This follows classic information theory: uncertainty is **additive** across uncorrelated sources.
 
----
+
 
 #### 💥 Implication for System Design
 
@@ -514,7 +629,7 @@ This follows classic information theory: uncertainty is **additive** across unco
 - **Independent branches** grow risk linearly
 - AgentBound must **model edge relationships** to get accurate path entropy estimates
 
----
+
 
 #### 📐 Formal Rule
 
@@ -529,7 +644,7 @@ For each edge between agents A and B:
 - If B constrains A (validator):  
   apply bounding operator (e.g., `min`, `clamp`, or collapse to 0)
 
----
+
 
 #### 🧪 Axiom 15: Multiplicative Entropy via Dependency
 
@@ -565,13 +680,13 @@ Path entropy = 21.0
 
 ```
 
----
+
 
 ## Code + Docs
 
 See the [README](/README.md) for information on how to run the toy example [`agentbound.py`](\agentbound.py).
 
----
+
 
 ## License
 
