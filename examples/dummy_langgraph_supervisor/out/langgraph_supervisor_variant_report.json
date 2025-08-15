@@ -1,0 +1,9 @@
+{
+  "graph_json": "out/langgraph_supervisor_variant.json",
+  "entropy_score": 1.4,
+  "entropy_level": "Very High",
+  "generative_nodes": 3,
+  "deterministic_nodes": 2,
+  "gen_to_gen_edges": 4,
+  "coupling_factor": 1.667
+}

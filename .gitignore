@@ -3,6 +3,6 @@
 __pycache__/
 *.pyc
 
-# Outputs
+# Ignore all out/ except in examples/dummy_langraph_supervisor
 out/
-examples/*/out/
+!examples/dummy_langraph_supervisor/out/
