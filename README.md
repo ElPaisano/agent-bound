@@ -164,9 +164,9 @@ Consider the following example output from the [Dummy LangGraph Supervisor demo]
 }
 ```
 
-- `A`: Baseline design metrics (`langgraph_supervisor.py`). For an explanation of metrics, see (Single graph analysis)[#single-graph-analysis].
+- `A`: Baseline design metrics (`langgraph_supervisor.py`). For an explanation of metrics, see [Single graph analysis[(#single-graph-analysis).
 
-- `B`: Variant design metrics (`langgraph_supervisor_variant.py`). For an explanation of metrics, see (Single graph analysis)[#single-graph-analysis].
+- `B`: Variant design metrics (`langgraph_supervisor_variant.py`). For an explanation of metrics, see [Single graph analysis](#single-graph-analysis).
 
 - `delta` A diff (`B - A`) of key dimensions.
 
@@ -213,6 +213,9 @@ AgentBound V0 supports:
 - Comparing two designs for structural differences.
 
 Future work will expand framework support, improve visualizations, and integrate with CI/CD pipelines.
+
+## Getting help
+Please open an issue with the graph JSON and a brief description of what you expected vs. what you saw.
 
 ## License
 
