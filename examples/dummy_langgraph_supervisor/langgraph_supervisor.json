@@ -1,0 +1,50 @@
+{
+  "nodes": [
+    {
+      "id": "__start__",
+      "label": "__start__"
+    },
+    {
+      "id": "supervisor",
+      "label": "supervisor"
+    },
+    {
+      "id": "research_agent",
+      "label": "research_agent"
+    },
+    {
+      "id": "math_agent",
+      "label": "math_agent"
+    },
+    {
+      "id": "__end__",
+      "label": "__end__"
+    }
+  ],
+  "edges": [
+    [
+      "__start__",
+      "supervisor"
+    ],
+    [
+      "math_agent",
+      "supervisor"
+    ],
+    [
+      "research_agent",
+      "supervisor"
+    ],
+    [
+      "supervisor",
+      "__end__"
+    ],
+    [
+      "supervisor",
+      "math_agent"
+    ],
+    [
+      "supervisor",
+      "research_agent"
+    ]
+  ]
+}

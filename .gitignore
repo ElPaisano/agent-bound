@@ -1,0 +1,8 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Outputs
+out/
+examples/*/out/
