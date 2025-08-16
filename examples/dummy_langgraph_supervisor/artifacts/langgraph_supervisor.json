@@ -1,0 +1,34 @@
+{
+  "nodes": [
+    {
+      "id": "supervisor",
+      "label": "Supervisor"
+    },
+    {
+      "id": "research_agent",
+      "label": "Research Agent"
+    },
+    {
+      "id": "math_agent",
+      "label": "Math Agent"
+    }
+  ],
+  "edges": [
+    [
+      "supervisor",
+      "research_agent"
+    ],
+    [
+      "supervisor",
+      "math_agent"
+    ],
+    [
+      "research_agent",
+      "supervisor"
+    ],
+    [
+      "math_agent",
+      "supervisor"
+    ]
+  ]
+}

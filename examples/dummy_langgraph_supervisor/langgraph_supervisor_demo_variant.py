@@ -1,29 +1,30 @@
 # langgraph_supervisor_demo_variant.py
-# Offline: builds a supervisor graph with deterministic anchors,
-# then exports JSON + a kind-map that marks 'supervisor' deterministic.
+# Offline variant: adds deterministic anchors (retriever, schema_validator)
+# and marks the supervisor node as deterministic via kind_map.
 
 import json, os
-from langgraph.prebuilt import create_react_agent
-from langgraph_supervisor import create_supervisor
-from langgraph.graph import StateGraph
+from typing import Iterable, Union
 
-# ---- Dummy LLM/tools (no API) ----
+from langgraph.prebuilt import create_react_agent
+
+# ---- Dummy LLM (no API calls) ----
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.outputs import ChatResult, ChatGeneration
-from langchain_core.tools import tool
+from langchain_core.tools import BaseTool, tool
 
 class DummyLLM(BaseChatModel):
     @property
     def _llm_type(self): return "dummy"
     @property
     def _identifying_params(self): return {}
-    def bind_tools(self, tools, **kwargs): return self
+    def bind_tools(self, tools: Iterable[Union[BaseTool, type]], **kwargs): return self
     def _generate(self, messages, stop=None, **kwargs) -> ChatResult:
         return ChatResult(generations=[ChatGeneration(message=AIMessage(content="(dummy)"))])
 
 dummy_llm = DummyLLM()
 
+# ---- Deterministic tools ----
 @tool
 def dummy_retriever(query: str) -> str:
     """Deterministic anchor for docs retrieval."""
@@ -34,66 +35,48 @@ def schema_validator(payload: str) -> str:
     """Deterministic checker that returns 'OK'/'FAIL'."""
     return "OK"
 
-# Agents
+# ---- Two LLM-only worker agents ----
 planner_llm = create_react_agent(
     model=dummy_llm,
-    tools=[],  # pure planning LLM
+    tools=[],
     prompt="You are a planner. Break tasks into steps and propose tools.",
     name="planner_llm",
 )
 
 worker_llm = create_react_agent(
     model=dummy_llm,
-    tools=[],  # pure execution LLM
+    tools=[],
     prompt="You are a worker. Produce answers from structured inputs.",
     name="worker_llm",
 )
 
-# “Supervisor” routes, but we’ll mark it *deterministic* via kind_map later.
-supervisor = create_supervisor(
-    agents=[planner_llm, worker_llm],  # two LLMs inside graph
-    model=dummy_llm,
-    prompt=("Route tasks deterministically to planner then worker. "
-            "Prefer using retriever + validator anchors."),
-).compile()
-
-# Export graph JSON (using to_json for compatibility)
+# ---- Offline supervisor topology ----
+# Unlike the base demo, we hardcode the supervisor node and deterministic anchors.
 os.makedirs("out", exist_ok=True)
-graph = supervisor.get_graph().to_json()
 
-# Build a more anchored flow around supervisor by adding tool nodes into JSON:
-# We'll inject extra deterministic nodes (retriever, validator) into edges around planner/worker.
-# Minimal tweak: just add them as labeled nodes; edges already imply supervisor<->planner/worker.
-nodes = [{"id": n["id"], "label": (n.get("data") or {}).get("name") or n["id"]} for n in graph["nodes"]]
-edges = [[e["source"], e["target"]] for e in graph["edges"]]
-
-# Ensure tool nodes exist
-tool_nodes = [
-    {"id": "retriever", "label": "retriever"},
-    {"id": "schema_validator", "label": "schema_validator"},
+nodes = [
+    {"id": "supervisor", "label": "Supervisor"},
+    {"id": "planner_llm", "label": "Planner LLM"},
+    {"id": "worker_llm", "label": "Worker LLM"},
+    {"id": "retriever", "label": "Retriever"},
+    {"id": "schema_validator", "label": "Schema Validator"},
 ]
-# Add if missing
-existing_ids = {n["id"] for n in nodes}
-for t in tool_nodes:
-    if t["id"] not in existing_ids:
-        nodes.append(t)
 
-# Wire planner -> retriever -> worker path (deterministic anchors cut gen→gen coupling)
-if ["planner_llm","retriever"] not in edges:
-    edges.append(["planner_llm","retriever"])
-if ["retriever","worker_llm"] not in edges:
-    edges.append(["retriever","worker_llm"])
-# Add worker -> validator -> supervisor return path
-if ["worker_llm","schema_validator"] not in edges:
-    edges.append(["worker_llm","schema_validator"])
-if ["schema_validator","supervisor"] not in edges:
-    edges.append(["schema_validator","supervisor"])
+edges = [
+    ["supervisor", "planner_llm"],
+    ["planner_llm", "retriever"],
+    ["retriever", "worker_llm"],
+    ["worker_llm", "schema_validator"],
+    ["schema_validator", "supervisor"],
+]
 
 out_json = "out/langgraph_supervisor_variant.json"
-json.dump({"nodes": nodes, "edges": edges}, open(out_json, "w"), indent=2)
+with open(out_json, "w") as f:
+    json.dump({"nodes": nodes, "edges": edges}, f, indent=2)
+
 print("Exported:", out_json)
 
-# Kind map: mark supervisor deterministic; tools deterministic; LLMs generative.
+# ---- Kind map: deterministic vs generative ----
 kind_map = {
     "supervisor": "deterministic",
     "planner_llm": "generative",
@@ -101,5 +84,8 @@ kind_map = {
     "retriever": "deterministic",
     "schema_validator": "deterministic",
 }
-json.dump(kind_map, open("out/kind_map_variant.json", "w"), indent=2)
+
+with open("out/kind_map_variant.json", "w") as f:
+    json.dump(kind_map, f, indent=2)
+
 print("Wrote kind map: out/kind_map_variant.json")

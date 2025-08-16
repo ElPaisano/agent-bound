@@ -1,0 +1,6 @@
+# Minimal deps for the demo (do NOT pin langchain-core to 0.2.x)
+langgraph==0.6.5
+langgraph-checkpoint==2.1.1
+
+# Optional extras if your demo imports them directly
+pydantic>=2,<3

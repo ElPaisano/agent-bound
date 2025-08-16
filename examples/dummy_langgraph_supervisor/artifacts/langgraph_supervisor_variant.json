@@ -1,0 +1,46 @@
+{
+  "nodes": [
+    {
+      "id": "supervisor",
+      "label": "Supervisor"
+    },
+    {
+      "id": "planner_llm",
+      "label": "Planner LLM"
+    },
+    {
+      "id": "worker_llm",
+      "label": "Worker LLM"
+    },
+    {
+      "id": "retriever",
+      "label": "Retriever"
+    },
+    {
+      "id": "schema_validator",
+      "label": "Schema Validator"
+    }
+  ],
+  "edges": [
+    [
+      "supervisor",
+      "planner_llm"
+    ],
+    [
+      "planner_llm",
+      "retriever"
+    ],
+    [
+      "retriever",
+      "worker_llm"
+    ],
+    [
+      "worker_llm",
+      "schema_validator"
+    ],
+    [
+      "schema_validator",
+      "supervisor"
+    ]
+  ]
+}

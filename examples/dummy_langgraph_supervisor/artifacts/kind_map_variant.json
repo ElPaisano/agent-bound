@@ -1,0 +1,7 @@
+{
+  "supervisor": "deterministic",
+  "planner_llm": "generative",
+  "worker_llm": "generative",
+  "retriever": "deterministic",
+  "schema_validator": "deterministic"
+}

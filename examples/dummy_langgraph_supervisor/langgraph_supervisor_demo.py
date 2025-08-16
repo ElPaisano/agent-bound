@@ -1,23 +1,19 @@
 # Offline Supervisor demo: no API keys, no network calls.
-# Builds a real LangGraph Supervisor graph using a Dummy LLM and a dummy tool,
-# then exports nodes/edges to out/langgraph_supervisor.json.
+# Builds a simple agent "supervisor" topology using a Dummy LLM and a dummy tool,
+# then exports nodes/edges to out/langgraph_supervisor.json for AgentBound.
 
 import json
 import os
+from typing import Iterable, Union
 
+# LangGraph bits (agents are built but not executed)
 from langgraph.prebuilt import create_react_agent
-from langgraph_supervisor import create_supervisor
-from langgraph.graph import StateGraph
 
 # ---- Minimal Dummy LLM that satisfies BaseChatModel ----
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.outputs import ChatResult, ChatGeneration
-from typing import Iterable, Union
-from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import AIMessage
-from langchain_core.outputs import ChatResult, ChatGeneration
-from langchain_core.tools import BaseTool
+from langchain_core.tools import BaseTool, tool
 
 class DummyLLM(BaseChatModel):
     """No-op chat model: satisfies LangChain interfaces and never calls external APIs."""
@@ -30,7 +26,7 @@ class DummyLLM(BaseChatModel):
     def _identifying_params(self) -> dict:
         return {}
 
-    # <-- Add this: create_react_agent calls .bind_tools(...) unconditionally
+    # create_react_agent calls .bind_tools(...) unconditionally
     def bind_tools(
         self,
         tools: Iterable[Union[BaseTool, type]],
@@ -46,14 +42,12 @@ class DummyLLM(BaseChatModel):
 dummy_llm = DummyLLM()
 
 # ---- Dummy tool (no external deps) ----
-from langchain_core.tools import tool
-
 @tool
 def dummy_search(query: str) -> str:
     """Fake search tool — returns a canned response."""
     return f"[dummy results for: {query}]"
 
-# ---- Build worker agents with the dummy llm/tool ----
+# ---- Build worker agents with the dummy llm/tool (for realism; not invoked here) ----
 research_agent = create_react_agent(
     model=dummy_llm,
     tools=[dummy_search],
@@ -68,38 +62,25 @@ math_agent = create_react_agent(
     name="math_agent",
 )
 
-# ---- Supervisor routes between agents (also uses DummyLLM) ----
-supervisor = create_supervisor(
-    agents=[research_agent, math_agent],
-    model=dummy_llm,
-    prompt=(
-        "You are a supervisor managing two agents:\n"
-        "- research agent for research tasks\n"
-        "- math agent for math tasks\n"
-        "Delegate tasks to one agent at a time based on user requests."
-    ),
-).compile()
+# ---- Define a minimal supervisor topology offline ----
+# We do not import or compile a real LangGraph supervisor here.
+# AgentBound only needs a {nodes, edges} JSON. We export a simple shape:
+# supervisor <-> research_agent, supervisor <-> math_agent
 
-# ---- Export the compiled graph (networkx DiGraph) to JSON for AgentBound ----
-# ---- Export the compiled graph to JSON (no NetworkX needed) ----
 os.makedirs("out", exist_ok=True)
 
-graph_obj = supervisor.get_graph()          # drawable graph wrapper
-data = graph_obj.to_json()                  # -> {"nodes":[...], "edges":[...]}
+nodes = [
+    {"id": "supervisor", "label": "Supervisor"},
+    {"id": "research_agent", "label": "Research Agent"},
+    {"id": "math_agent", "label": "Math Agent"},
+]
 
-# nodes have "id" and "data" (type/metadata); edges have "source"/"target"
-nodes = []
-for n in data["nodes"]:
-    nid = str(n.get("id"))
-    # Try a few reasonable label fields, fallback to id
-    label = (
-        (n.get("data") or {}).get("name")
-        or (n.get("data") or {}).get("label")
-        or nid
-    )
-    nodes.append({"id": nid, "label": str(label)})
-
-edges = [[str(e["source"]), str(e["target"])] for e in data["edges"]]
+edges = [
+    ["supervisor", "research_agent"],
+    ["supervisor", "math_agent"],
+    ["research_agent", "supervisor"],
+    ["math_agent", "supervisor"],
+]
 
 with open("out/langgraph_supervisor.json", "w") as f:
     json.dump({"nodes": nodes, "edges": edges}, f, indent=2)
