@@ -75,7 +75,7 @@ AgentBound extracts the following from the graph (excluding aux nodes):
 
 ```python
 coupling = 1.0 + (sqrt(gg) / max(1, G))   if G > 0
-coupling = 1.0                            if G = 0
+coupling = 1.0                            if G == 0
 ```
 
 **Entropy score (V0):**
@@ -160,7 +160,7 @@ python agentbound.py path/to/graph.json
 
 Outputs: PNG diagram + JSON metrics.
 
-Next, learn how to [interpet single graph analysis](#single-graph-analysis).
+Next, learn how to [interpret single graph analysis](#single-graph-analysis).
 
 ## Compare two graphs
 
@@ -170,7 +170,7 @@ python agentbound_compare.py graph_A.json graph_B.json
 
 Outputs: side-by-side PNG comparison + JSON diff.
 
-Next, learn how to [interpet comparison output](#graph-comparison).
+Next, learn how to [interpret comparison output](#graph-comparison).
 
 ## Interpret AgentBound output
 
