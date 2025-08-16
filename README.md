@@ -165,11 +165,11 @@ Outputs: side-by-side PNG comparison + JSON diff.
 
 ## Interpret AgentBound output
 
-> Before interepreting AgentBound output, make sure you understand the [scoring methodology](#how-agentbound-scores-a-graph).
+> Before interpreting results, make sure you understand the [scoring methodology](#how-agentbound-scores-a-graph).
 
 ### Single graph analysis
 
-Example output:
+AgentBound produces a JSON summary for each graph. For example:
 
 ```json
 {
@@ -183,21 +183,24 @@ Example output:
 }
 ```
 
-* High `entropy_score` → more potential for drift, loops, or brittle designs.
-* `entropy_level` → buckets scores into plain English (Low → Very High).
-* `generative_nodes (G)` = stochastic components (LLMs, generative tools).
-* `deterministic_nodes (D)` = validators, retrieval, DB calls, etc.
-* `gen_to_gen_edges` = LLM→LLM edges (amplify error).
-* `coupling_factor` = grows as LLMs feed each other.
+Key fields:
 
-Example: 
-3 G, 0 D, 4 LLM→LLM edges = **Very High** risk. Add validators or reduce LLM handoffs.
+* **`entropy_score`** → overall risk metric (higher = more drift / brittleness).
+* **`entropy_level`** → plain-English bucket (Low → Very High).
+* **`generative_nodes (G)`** = stochastic components (LLMs, generative tools).
+* **`deterministic_nodes (D)`** = anchors (validators, retrieval, DB calls).
+* **`gen_to_gen_edges`** = direct LLM→LLM handoffs (amplify error).
+* **`coupling_factor`** = increases as LLMs depend on each other.
 
-![Graph output](examples/dummy_langgraph_supervisor/out/langgraph_supervisor.png)
+Example:
+3 G, 0 D, 4 LLM→LLM edges → **Very High** entropy.
+Design tip: add deterministic anchors or reduce LLM handoffs.
 
-### Comparison
+![Graph output](examples/dummy_langgraph_supervisor/artifacts/langgraph_supervisor.png)
 
-Example diff:
+### Graph comparison
+
+AgentBound can also diff two graphs to show the effect of design changes:
 
 ```json
 "A": { ... "entropy_level": "Very High" },
@@ -205,10 +208,12 @@ Example diff:
 "delta": { "entropy": -1.67, "D": +3 }
 ```
 
-* `B` adds deterministic nodes and removes LLM→LLM edges.
-* Entropy drops from Very High → Moderate.
+Interpretation:
 
-![Compare output](examples/dummy_langgraph_supervisor/out/compare.png)
+* **B** adds deterministic anchors and removes LLM→LLM edges.
+* Entropy drops from *Very High* → *Moderate*.
+
+![Compare output](examples/dummy_langgraph_supervisor/artifacts/compare.png)
 
 ### Next steps based on output
 
