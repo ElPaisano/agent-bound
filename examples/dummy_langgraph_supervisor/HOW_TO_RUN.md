@@ -133,18 +133,18 @@ Report excerpt:
 ```json
 {
   "graph_json": "out/langgraph_supervisor_variant.json",
-  "entropy_score": 0.400,
-  "entropy_level": "Moderate",
-  "generative_nodes": 2,
-  "deterministic_nodes": 3,
-  "gen_to_gen_edges": 0,
-  "coupling_factor": 0.000
+  "entropy_score": 0.9,
+  "entropy_level": "High",
+  "generative_nodes": 3,
+  "deterministic_nodes": 2,
+  "gen_to_gen_edges": 1,
+  "coupling_factor": 1.333
 }
 ```
 
 Diagram: `langgraph_supervisor_variant.png`
 
-Interpretation: Deterministic anchors (retriever, schema validator, supervisor) reduce entropy. No direct LLM→LLM edges. Entropy score drops to Moderate.
+Interpretation: Deterministic anchors (retriever, schema validator, supervisor) reduce entropy. No direct LLM to LLM edges. Entropy score drops to Moderate.
 
 ![Graph output](artifacts/langgraph_supervisor_variant.png)
 
@@ -153,10 +153,11 @@ Interpretation: Deterministic anchors (retriever, schema validator, supervisor) 
 Diff excerpt:
 
 ```
-{
-  "entropy_delta": -1.667,
-  "generative_delta": -1,
-  "deterministic_delta": +3
+"delta": {
+  "entropy": -1.1670000000000003,
+  "coupling": -0.3340000000000001,
+  "G": 0,
+  "D": 2
 }
 ```
 
