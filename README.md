@@ -8,6 +8,10 @@ By running AgentBound on your system design, you can:
 * Compare design variants to see how changes affect stability.
 * Export diagrams and metrics for design reviews.
 
+> **I just want to see AgentBound in action!**
+>
+> The fastest way is the [Dummy LangGraph Supervisor demo](./examples/dummy_langraph_supervisor/HOW_TO_RUN.md). You’ll get visual diagrams, JSON reports, and a comparison diagram.
+
 ## Learn it
 
 Learn more about [agentic entropy](#what-is-agentic-entropy), [how AgentBound scores a graph](#how-agentbound-scores-a-graph), and [what AgentBound does and doesn't claim](#what-agentbound-does-and-does-not-claim).
@@ -17,10 +21,6 @@ Learn more about [agentic entropy](#what-is-agentic-entropy), [how AgentBound sc
 1. Complete the [general setup](#general-setup).
 2. Use AgentBound to [analyze a single graph](#analyze-a-single-graph) or [compare two graphs](#compare-two-graphs).
 3. [Interpret the output](#interpret-agentbound-output).
-
-> **But I just want to see AgentBound in action!**
->
-> The fastest way is the [Dummy LangGraph Supervisor demo](./examples/dummy_langraph_supervisor/HOW_TO_RUN.md). You’ll get visual diagrams, JSON reports, and a comparison diagram.
 
 ## Table of Contents
 
