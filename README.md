@@ -130,22 +130,27 @@ You’ll get visual diagrams, JSON reports, and a comparison diagram.
 
    ```bash
    git clone https://github.com/ElPaisano/agent-bound.git
+   ```
+
+2. Navigate to the repository:
+
+   ```bash
    cd agent-bound
    ```
 
-2. Create and activate a virtual environment:
+3. (Optional) Create and activate a virtual environment:
 
    ```bash
    python -m venv .venv && source .venv/bin/activate
    ```
 
-3. Install dependencies:
+4. Install dependencies:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-4. [Use AgentBound](#use-agentbound).
+5. [Analyze a single graph](#analyze-a-single-graph) and/or [compare two graphs](#compare-two-graphs).
 
 ## Analyze a single graph
 
@@ -155,6 +160,8 @@ python agentbound.py path/to/graph.json
 
 Outputs: PNG diagram + JSON metrics.
 
+Next, learn how to [interpet single graph analysis](#single-graph-analysis).
+
 ## Compare two graphs
 
 ```bash
@@ -162,6 +169,8 @@ python agentbound_compare.py graph_A.json graph_B.json
 ```
 
 Outputs: side-by-side PNG comparison + JSON diff.
+
+Next, learn how to [interpet comparison output](#graph-comparison).
 
 ## Interpret AgentBound output
 
