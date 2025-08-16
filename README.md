@@ -1,45 +1,128 @@
 # AgentBound
 
-AgentBound is a design-time analysis tool for AI agents. It computes an _agentic entropy_ score from an agentic system architecture graph and flags risky patterns such as long generative-to-generative chains, loops, and missing validators.
+AgentBound is a design-time static analysis tool for AI agent systems. Think of it like a linter for agent graphs: it computes an _agentic entropy_ score from an agent architecture and flags risky patterns such as long generative-to-generative chains, loops, and missing validators.
 
 By running AgentBound on your system design, you can:
-- Identify structural risks before finalizing code.
-- Compare two designs to understand how changes affect stability.
-- Export diagrams and metrics for design reviews.
 
-## TOC
+* Identify structural risks before finalizing code.
+* Compare design variants to see how changes affect stability.
+* Export diagrams and metrics for design reviews.
 
-- [What is agentic entropy?](#what-is-agentic-entropy-)
-- [Quickstart: Run the Demo](#quickstart--run-the-demo)
-- [General setup](#general-setup)
-- [Use AgentBound](#use-agentbound)
-    - [Analyze a single graph](#analyze-a-single-graph)
-    - [Compare two graphs](#compare-two-graphs)
-- [Interpret AgentBound output](#interpret-agentbound-output)
-    - [Single graph analysis](#single-graph-analysis)
-    - [Comparison](#comparison)
-    - [What AgentBound does and does not claim](#what-agentbound-does-and-does-not-claim)
-    - [Next steps based on output](#next-steps-based-on-output)
-      - [If `entropy` is high](#if--entropy--is-high)
-      - [If comparing designs](#if-comparing-designs)
-- [Project status](#project-status)
+## Learn it
+
+Learn more about [agentic entropy](#what-is-agentic-entropy), [how AgentBound scores a graph](#how-agentbound-scores-a-graph), and [what AgentBound does and doesn't claim](#what-agentbound-does-and-does-not-claim).
+
+## Use it
+
+1. Complete the [general setup](#general-setup).
+2. Use AgentBound to [analyze a single graph](#analyze-a-single-graph) or [compare two graphs](#compare-two-graphs).
+3. [Interpret the output](#interpret-agentbound-output).
+
+> **But I just want to see AgentBound in action!**
+>
+> The fastest way is the [Dummy LangGraph Supervisor demo](./examples/dummy_langraph_supervisor/HOW_TO_RUN.md). You’ll get visual diagrams, JSON reports, and a comparison diagram.
+
+## Table of Contents
+
+* [Learn it](#learn-it)
+  * [What is agentic entropy?](#what-is-agentic-entropy)
+  * [What AgentBound does and does not claim](#what-agentbound-does-and-does-not-claim)
+  * [How AgentBound scores a graph](#how-agentbound-scores-a-graph)
+* [Use it](#use-it)
+  * [Quickstart: Run the Demo](#quickstart-run-the-demo)
+  * [General setup](#general-setup)
+  * [Analyze a single graph](#analyze-a-single-graph)
+  * [Compare two graphs](#compare-two-graphs)
+  * [Interpret AgentBound output](#interpret-agentbound-output)
+    * [Single graph analysis](#single-graph-analysis)
+    * [Comparison](#comparison)
+    * [Next steps based on output](#next-steps-based-on-output)
+* [Project status](#project-status)
+* [Getting help](#getting-help)
+* [License](#license)
 
 ## What is agentic entropy?
 
-_Agentic entropy_ is a structural signal that reflects the potential unpredictability of an agentic system before it is deployed. High entropy can indicate higher structural risk, such as unpredictable hand-offs between generative components or missing control points.
+*Agentic entropy* is a structural signal that reflects the **potential unpredictability** of an agentic system before it is deployed. High entropy often indicates higher design risk, such as:
 
-> Agentic entropy is an area of active research, and the scoring and measurement methodology will be further refined in future versions.
+* Unpredictable hand-offs between generative components
+* Missing validators or control points
+* Loops or long generative chains
+
+> Agentic entropy is an area of **active research**. The scoring methodology will continue to be refined.
+
+## What AgentBound does and does not claim
+
+* **Design-time signal only.** Based on graph structure and heuristics. Helps you catch risky shapes before final implementation.
+* **Useful for architecture reviews.** Justify adding validators, reducing LLM-to-LLM chains, or splitting flows.
+* **NOT a runtime guarantee.** Doesn’t predict accuracy or KPIs. Complements—rather than replaces—post-deploy evals and monitoring.
+
+## How AgentBound scores a graph
+
+AgentBound extracts the following from the graph (excluding aux nodes):
+
+* **G** = count of generative nodes
+* **D** = count of deterministic nodes
+* **gg** = count of edges from generative → generative
+
+**Node kind inference (can be overridden with a kind map):**
+
+* Generative if id/label matches `llm|gpt|model|generate|writer|assistant|agent|supervisor` (case-insensitive)
+* Deterministic otherwise
+* Aux if id starts with `__` (excluded from scoring)
+
+**Coupling factor:**
+
+```python
+coupling = 1.0 + (sqrt(gg) / max(1, G))   if G > 0
+coupling = 1.0                            if G = 0
+```
+
+**Entropy score (V0):**
+
+```python
+entropy = (G / max(1, G + D)) * coupling + 0.1 * gg
+```
+
+**Risk levels:**
+
+* `< 0.30` → Low
+* `< 0.60` → Moderate
+* `< 0.90` → High
+* `≥ 0.90` → Very High
+
+**Optional resilience (if results JSON is provided):**
+
+* Requires `baseline.fail_rate` and `perturbed.fail_rate`
+* Resilience index:
+
+  ```python
+  if both fail rates ~0 → 1.0
+  else → 1 - (perturbed / max(eps, baseline)), bounded [0,1]
+  ```
+* Quadrant classification:
+
+  * Low entropy + Low resilience → Fragile
+  * High entropy + Low resilience → Chaotic Fragility
+  * Low entropy + High resilience → Robust
+  * High entropy + High resilience → Antifragile
+
+**Outputs:**
+
+* PNG diagram with generative→generative edges highlighted in red
+* JSON report with entropy metrics, and optional resilience/quadrant
 
 ## Quickstart: Run the Demo
 
-The fastest way to see AgentBound in action is to run the [Dummy LangGraph Supervisor demo](./examples/dummy_langraph_supervisor/HOW_TO_RUN.md).
+The fastest way to try AgentBound is the [Dummy LangGraph Supervisor demo](./examples/dummy_langraph_supervisor/HOW_TO_RUN.md).
 
 The demo will:
+
 1. Generate two versions of a simple multi-agent LangGraph Supervisor.
 2. Analyze each version individually.
 3. Compare both versions side by side.
 
-You'll get visual diagrams, JSON reports, and a comparison diagram.
+You’ll get visual diagrams, JSON reports, and a comparison diagram.
 
 ## General setup
 
@@ -64,43 +147,31 @@ You'll get visual diagrams, JSON reports, and a comparison diagram.
 
 4. [Use AgentBound](#use-agentbound).
 
-## Use AgentBound
-
-You can either [analyze a single graph](#analyze-a-single-graph), or [compare two design variants side-by-side](#compare-two-graphs).
-
-> *Supported input formats*
->
-> Currently supports JSON output from [LangGraph](https://github.com/langchain-ai/langgraph) (`StateGraph` export).
-
-### Analyze a single graph
-
-Produce a PNG diagram and a JSON metrics report.
+## Analyze a single graph
 
 ```bash
 python agentbound.py path/to/graph.json
 ```
 
-Next, learn how to interpret [single graph analysis](#single-graph-analysis).
+Outputs: PNG diagram + JSON metrics.
 
-### Compare two graphs
-
-Produce a side-by-side comparison diagram and a JSON comparison report.
+## Compare two graphs
 
 ```bash
 python agentbound_compare.py graph_A.json graph_B.json
 ```
 
-Next, learn how to interpret [comparison output](#comparison).
+Outputs: side-by-side PNG comparison + JSON diff.
 
 ## Interpret AgentBound output
 
-Here’s how to read outputs and what they imply for design decisions.
+> Before interepreting AgentBound output, make sure you understand the [scoring methodology](#how-agentbound-scores-a-graph).
 
 ### Single graph analysis
 
-Consider the following example output from the [Dummy LangGraph Supervisor demo](./examples/dummy_langgraph_supervisor/HOW_TO_RUN.md). Specifically, this is the terminal output generated by running `agentbound.py` on `langgraph_supervisor.py`.
+Example output:
 
-```bash
+```json
 {
   "graph_json": "out/langgraph_supervisor.json",
   "entropy_score": 2.067,
@@ -112,113 +183,54 @@ Consider the following example output from the [Dummy LangGraph Supervisor demo]
 }
 ```
 
-The output can be understood as follows:
+* High `entropy_score` → more potential for drift, loops, or brittle designs.
+* `entropy_level` → buckets scores into plain English (Low → Very High).
+* `generative_nodes (G)` = stochastic components (LLMs, generative tools).
+* `deterministic_nodes (D)` = validators, retrieval, DB calls, etc.
+* `gen_to_gen_edges` = LLM→LLM edges (amplify error).
+* `coupling_factor` = grows as LLMs feed each other.
 
-- `graph_json`: The input file that was analyzed.
-- `entropy_score`: A composite, design-time risk signal derived from how many generative nodes (LLMs/agents) the design uses, how often LLM to LLM handoffs occur (amplifies uncertainty), and a coupling factor that increases when generative nodes feed other generative nodes.
+Example: 
+3 G, 0 D, 4 LLM→LLM edges = **Very High** risk. Add validators or reduce LLM handoffs.
 
-  > A higher `entropy_score` indicates a riskier structure (e.g. more potential for drift, loops, hard-to-debug behavior). In this example, `2.067` is high for a small graph.
-
-- `entropy_level`: A plain-English bucket for the score. Useful for quick scanning in reviews.
-- `generative_nodes (G)`: Count of stochastic components (LLMs, generative tools). More G usually increases uncertainty.
-- `deterministic_nodes (D)`: Count of deterministic components (validators, retrieval, formatters, rule-based tools, API calls, DB calls, etc.). D typically bounds uncertainty.
-- `gen_to_gen_edges`: Number of LLM to LLM edges. These are hotspots for error amplification and semantic drift.
-- `coupling_factor`: A simple multiplier that grows with `gen_to_gen_edges` connectivity density. It models how “tightly” generative pieces influence each other.
-
-Based on the output, you can interpret the example as follows:
-
-3 generative nodes, 0 deterministic nodes, and 4 LLM to LLM edges yield a `Very High` structural risk. To improve the architecture, you'd do one of the following (or both):
-  1. Add validators, routers, or format checks to bound this design.
-  2. Reduce direct LLM and LLM handoffs.
-
-In `out/langgraph_supervisor.png`, LLM to LLM edges are marked in red. More red implies more amplification risk.
-
-![`out/langgraph_supervisor.png`](examples/dummy_langgraph_supervisor/out/langgraph_supervisor.png)
+![Graph output](examples/dummy_langgraph_supervisor/out/langgraph_supervisor.png)
 
 ### Comparison
 
-Consider the following example output from the [Dummy LangGraph Supervisor demo](./examples/dummy_langgraph_supervisor/HOW_TO_RUN.md). Specifically, this is the terminal output generated by running `agentbound_compare.py` on `langgraph_supervisor.py` and `langgraph_supervisor_variant.py`.
+Example diff:
 
-```bash
-"A": {
-  "entropy_score": 2.067,
-  "entropy_level": "Very High",
-  "generative_nodes": 3,
-  "deterministic_nodes": 0,
-  "gen_to_gen_edges": 4,
-  "coupling_factor": 1.667
-},
-"B": {
-  "entropy_score": 0.4,
-  "entropy_level": "Moderate",
-  "generative_nodes": 2,
-  "deterministic_nodes": 3,
-  "gen_to_gen_edges": 0,
-  "coupling_factor": 1.0
-},
-"delta": {
-  "entropy": -1.6670000000000003,
-  "coupling": -0.667,
-  "G": -1,
-  "D": 3
-}
+```json
+"A": { ... "entropy_level": "Very High" },
+"B": { ... "entropy_level": "Moderate" },
+"delta": { "entropy": -1.67, "D": +3 }
 ```
 
-- `A`: Baseline design metrics (`langgraph_supervisor.py`). For an explanation of metrics, see [Single graph analysis[(#single-graph-analysis).
+* `B` adds deterministic nodes and removes LLM→LLM edges.
+* Entropy drops from Very High → Moderate.
 
-- `B`: Variant design metrics (`langgraph_supervisor_variant.py`). For an explanation of metrics, see [Single graph analysis](#single-graph-analysis).
-
-- `delta` A diff (`B - A`) of key dimensions.
-
-Based on the output, you can interpret the example as follows:
-
-- `entropy`: Overall structural risk decreased by `~1.67`, which is good.
-- `coupling`: Dropped by `0.667` due to fewer LLM to LLM interactions.
-- `G`: The number of generative nodes decreased by 1.
-- `D`: The number of deterministic nodes increased by 3.
-
-In general, variant `B` introduces deterministic components and removes LLM to LLM edges. As a result, entropy drops from `Very High` to `Moderate`.
-
-In `out/compare.png`, A and B are shown side by side. Expect fewer red edges and more gray “tool/validator” nodes in B.
-
-![`out/compare.png`](examples/dummy_langgraph_supervisor/out/compare.png)
-
-### What AgentBound does and does not claim
-
-- ✅ **Design-time signal only.** These scores are based on graph structure and simple heuristics. They help you catch risky shapes before final implementation.
-- ✅ **Useful for architecture reviews.** Use AgentBound to justify adding validators, reducing LLM to LLM chains, or splitting flows.
-- ❌ **Not a runtime guarantee.** This does not predict accuracy or business KPIs. It does not replace post-deploy evals or monitoring. In fact, it should complement post-deploy evals and monitoring as another tool in your agentic system building toolkit.
+![Compare output](examples/dummy_langgraph_supervisor/out/compare.png)
 
 ### Next steps based on output
 
-In general, iterate on the architecture before finalizing the implementation.
-
-#### If `entropy` is high
-
-- Insert validators or schema checks between LLM hops.
-- Replace some LLM to LLM hops with retrieval, tool calls, or filters.
-- Break long chains into bounded subgraphs.
-
-#### If comparing designs
-
-- Prefer variants that lower entropy without blocking necessary functionality.
-- Use `agentbound_compare.py` to show stakeholders a quantitative reason for the choice.
+* If entropy is **high**: add validators, retrieval, schema checks; shorten chains.
+* If comparing designs: prefer variants that reduce entropy without blocking functionality.
 
 ## Project status
 
 AgentBound V0 supports:
 
-- Parsing and analyzing LangGraph JSON files.
-- Generating visual diagrams and JSON metrics.
-- Comparing two designs for structural differences.
+* Parsing LangGraph JSON
+* Visual + JSON reports
+* Side-by-side design comparisons
 
-Future work will expand framework support, improve visualizations, and integrate with CI/CD pipelines.
+Future work: support more frameworks, richer visualizations, CI/CD integration.
 
 ## Getting help
-Please open an issue with the graph JSON and a brief description of what you expected vs. what you saw.
+
+Open an issue with your graph JSON and expected vs. actual results.
 
 ## License
 
-This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE.md).  
-You may use, copy, and modify the software for noncommercial purposes only.  
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE.md).
+You may use, copy, and modify the software for noncommercial purposes only.
 For commercial use, please contact the author.
