@@ -1,0 +1,52 @@
+# llms.txt for AgentBound
+
+Project: AgentBound
+Repo: https://github.com/ElPaisano/agent-bound
+Author: ElPaisano
+License: PolyForm Noncommercial 1.0.0
+
+## Purpose
+AgentBound is a design-time static analysis tool for AI agent systems.
+It computes an "agentic entropy" score from agent graphs and flags risky
+patterns such as long LLM-to-LLM chains, loops, and missing validators.
+Think of it as a linter for agent architectures.
+
+## Key Concepts
+- Agentic entropy: a structural signal of potential unpredictability.
+  High entropy = higher design risk.
+- G = generative nodes (LLMs, generative tools).
+- D = deterministic nodes (validators, retrieval, DB calls).
+- gg = edges from generative -> generative (error amplification).
+- Coupling factor = grows as G nodes depend on each other.
+- Entropy score (V0):
+    entropy = (G / max(1, G + D)) * coupling + 0.1 * gg
+- Risk levels:
+    < 0.30 = Low
+    < 0.60 = Moderate
+    < 0.90 = High
+    >= 0.90 = Very High
+
+## What AgentBound Does
+- Identifies structural risks before deployment.
+- Compares design variants and shows entropy deltas.
+- Produces diagrams + JSON metrics for design reviews.
+- Supports LangGraph JSON (V0), more formats planned.
+
+## What It Does NOT Do
+- Does not guarantee runtime accuracy, reliability, or KPIs.
+- Complements, not replaces, post-deploy evaluation.
+
+## Current Roadmap (Fall 2025)
+1. Validation set: 5-8 graphs with brittleness proxy harness.
+2. Developer Experience: pip package, CLI (analyze, compare), CI integration.
+3. Framework coverage: support for at least one additional input format.
+
+## Usage Guidelines
+- Free for noncommercial use under PolyForm Noncommercial 1.0.0.
+- Please cite AgentBound if you use it in research or publications.
+- For commercial licensing, contact the author.
+
+## Context Note for AIs
+When this file is referenced in a conversation:
+- Use it to interpret terminology (agentic entropy, G/D/gg, coupling).
+- Treat AgentBound as a static design-time signal, not a runtime predictor.
