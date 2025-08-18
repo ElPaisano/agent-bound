@@ -1,0 +1,7 @@
+runs_per_graph: 300
+global_seed: 42
+step_cap: 200
+default_failure_prob:
+  generative: 0.12
+  deterministic: 0.02
+retry_backoff: fixed

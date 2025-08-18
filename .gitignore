@@ -5,3 +5,10 @@ __pycache__/
 
 # Ignore generated output everywhere
 out/
+
+# Validation outputs
+validation/results/*
+# keep summaries (all levels)
+!validation/results/summary/**
+# keep empty dirs if you want
+!.gitkeep

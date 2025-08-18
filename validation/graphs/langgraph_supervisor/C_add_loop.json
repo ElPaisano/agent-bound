@@ -1,0 +1,50 @@
+{
+    "start_node": "supervisor",
+    "nodes": [
+      {
+        "id": "supervisor",
+        "label": "Supervisor",
+        "kind": "generative",
+        "edges": ["reviewer", "writer", "retriever"],
+        "__harness": {
+          "failure_prob": 0.12,
+          "retry_policy": { "max_retries": 2 },
+          "loop_policy": { "max_iters": 6 }
+        }
+      },
+      {
+        "id": "reviewer",
+        "label": "Reviewer",
+        "kind": "generative",
+        "edges": ["supervisor", "writer"],
+        "__harness": {
+          "failure_prob": 0.12,
+          "retry_policy": { "max_retries": 2 },
+          "loop_policy": { "max_iters": 6 }
+        }
+      },
+      {
+        "id": "writer",
+        "label": "Writer",
+        "kind": "generative",
+        "edges": [],
+        "__harness": {
+          "failure_prob": 0.12,
+          "retry_policy": { "max_retries": 1 },
+          "loop_policy": { "max_iters": 3 }
+        }
+      },
+      {
+        "id": "retriever",
+        "label": "Retriever",
+        "kind": "deterministic",
+        "edges": [],
+        "__harness": {
+          "failure_prob": 0.02,
+          "retry_policy": { "max_retries": 0 },
+          "loop_policy": { "max_iters": 3 }
+        }
+      }
+    ]
+  }
+  

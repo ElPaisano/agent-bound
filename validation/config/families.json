@@ -1,0 +1,17 @@
+{
+    "control": [
+      "A_baseline",
+      "B_add_validator"
+    ],
+    "chain": [
+      "D_longer_llm_chain",
+      "F_deep_chain"
+    ],
+    "fork": [
+      "E_wide_fork"
+    ],
+    "loop": [
+      "C_add_loop"
+    ]
+  }
+  
