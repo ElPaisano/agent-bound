@@ -8,7 +8,12 @@ By running AgentBound on your system design, you can:
 * Compare design variants to see how changes affect stability.
 * Export diagrams and metrics for design reviews.
 
-> **I just want to see AgentBound in action!**
+> **Skeptical? Need empirical validation?**
+>
+> The [`validation/`](validation/) directory contains experiments showing that AgentBound’s entropy scores track real brittleness in lightweight simulation tests.  
+> See [`VALIDATION.md`](validation/VALIDATION.md) for full details.
+
+> **Do you want to see AgentBound in action ASAP?**
 >
 > The fastest way is the [Dummy LangGraph Supervisor demo](./examples/dummy_langraph_supervisor/HOW_TO_RUN.md). You’ll get visual diagrams, JSON reports, and a comparison diagram.
 
@@ -37,6 +42,7 @@ Learn more about [agentic entropy](#what-is-agentic-entropy), [how AgentBound sc
     * [Single graph analysis](#single-graph-analysis)
     * [Comparison](#comparison)
     * [Next steps based on output](#next-steps-based-on-output)
+* [Validation](#validation)
 * [Project status](#project-status)
 * [Getting help](#getting-help)
 * [License](#license)
@@ -228,6 +234,16 @@ Interpretation:
 
 * If entropy is **high**: add validators, retrieval, schema checks; shorten chains.
 * If comparing designs: prefer variants that reduce entropy without blocking functionality.
+
+## Validation
+
+The [`validation/`](validation/) directory contains experiments that test AgentBound’s entropy scores against brittleness metrics from a lightweight simulation harness.
+
+* **Harness**: runs toy graph families (chains, forks, loops, etc.) and records failure/retry statistics.
+* **Integration**: `compute_entropy.py` merges these results with AgentBound’s entropy estimates.
+* **Analysis**: plots (with optional confidence intervals) visualize the relationship between entropy and brittleness.
+
+For full details and usage, see [`validation/VALIDATION.md`](validation/VALIDATION.md).
 
 ## Project status
 
