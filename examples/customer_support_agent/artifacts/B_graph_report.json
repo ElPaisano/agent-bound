@@ -1,0 +1,9 @@
+{
+  "graph_json": "examples/customer_support_agent/inputs/B_graph.json",
+  "entropy_score": 0.429,
+  "entropy_level": "Moderate",
+  "generative_nodes": 3,
+  "deterministic_nodes": 4,
+  "gen_to_gen_edges": 0,
+  "coupling_factor": 1.0
+}

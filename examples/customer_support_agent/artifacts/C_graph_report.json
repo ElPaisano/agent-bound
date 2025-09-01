@@ -1,0 +1,9 @@
+{
+  "graph_json": "examples/customer_support_agent/inputs/C_graph.json",
+  "entropy_score": 0.671,
+  "entropy_level": "High",
+  "generative_nodes": 3,
+  "deterministic_nodes": 4,
+  "gen_to_gen_edges": 1,
+  "coupling_factor": 1.333
+}

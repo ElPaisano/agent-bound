@@ -1,0 +1,58 @@
+{
+    "nodes": [
+      {
+        "id": "N1",
+        "label": "User Query"
+      },
+      {
+        "id": "N2",
+        "label": "Retriever generator"
+      },
+      {
+        "id": "N2a",
+        "label": "Doc Filter (deterministic)"
+      },
+      {
+        "id": "N3",
+        "label": "Summarizer LLM"
+      },
+      {
+        "id": "N4",
+        "label": "Schema Validator"
+      },
+      {
+        "id": "N5",
+        "label": "Response Draft generator"
+      },
+      {
+        "id": "N6",
+        "label": "Human Escalation"
+      }
+    ],
+    "edges": [
+      [
+        "N1",
+        "N2"
+      ],
+      [
+        "N2",
+        "N2a"
+      ],
+      [
+        "N2a",
+        "N3"
+      ],
+      [
+        "N3",
+        "N4"
+      ],
+      [
+        "N4",
+        "N5"
+      ],
+      [
+        "N5",
+        "N6"
+      ]
+    ]
+  }

@@ -3,7 +3,10 @@ import sys, json, math, re, os
 import networkx as nx
 import matplotlib.pyplot as plt
 
-GEN_HINTS = re.compile(r"(?:\b|_)(llm|gpt|model|generate|writer|assistant|agent|supervisor)(?:\b|_)", re.I)
+GEN_HINTS = re.compile(
+    r"(?:\b|_)(llm|gpt|model|generate|generator|writer|assistant|agent|supervisor)(?:\b|_)",
+    re.I,
+)
 OUT_DIR = "out"
 
 def infer_kind(node_id, label):
@@ -42,19 +45,34 @@ def quadrant(entropy, res):
     if not e_high and r_high:     return "Robust"
     return "Antifragile"
 
-def main(graph_json, results_json=None, kind_map_json=None):
-    os.makedirs(OUT_DIR, exist_ok=True)
+def main(graph_json, results_json=None, kind_map_json=None, output_path=None):
+    # normalize empty-string args
+    results_json = results_json if results_json and results_json.strip() else None
+    kind_map_json = kind_map_json if kind_map_json and kind_map_json.strip() else None
+    output_path  = output_path  if output_path  and output_path.strip()  else None
+    
     data = json.load(open(graph_json))
-    kind_map = json.load(open(kind_map_json)) if kind_map_json and os.path.exists(kind_map_json) else {}
+    kind_map = json.load(open(kind_map_json)) if (kind_map_json and os.path.exists(kind_map_json)) else {}
 
-    # Build nodes with kinds
+     # Build nodes with kinds (+ warn on kind_map mismatches)
     nodes = []
+    graph_ids = set()
     for n in data["nodes"]:
         nid   = n["id"]
         label = n.get("label") or nid
-        kind  = kind_map.get(nid) or infer_kind(nid, label)
+        kind  = (kind_map.get(nid) if kind_map else None) or infer_kind(nid, label)
         nodes.append({"id": nid, "label": label, "kind": kind})
+        graph_ids.add(nid)
     edges = [tuple(e) for e in data["edges"]]
+
+    if kind_map:
+        km_ids = set(kind_map.keys())
+        missing_in_graph = sorted(km_ids - graph_ids)
+        unused_in_km     = sorted(graph_ids - km_ids)
+        if missing_in_graph:
+            print(f"[warn] kind_map keys not found in graph: {missing_in_graph}")
+        if unused_in_km:
+            print(f"[note] nodes not in kind_map (will be inferred): {unused_in_km}")
 
     # Compute metrics
     met = compute_entropy(nodes, edges)
@@ -97,15 +115,23 @@ def main(graph_json, results_json=None, kind_map_json=None):
     # Footer with metrics
     footer = f"Entropy: {met['entropy_score']} ({met['entropy_level']})  |  G={met['generative_nodes']}  D={met['deterministic_nodes']}  gen→gen={met['gen_to_gen_edges']}  coupling={met['coupling_factor']}"
     if "quadrant" in met: footer += f"  |  Resilience={met['resilience_index']}  →  {met['quadrant']}"
-    plt.title("AgentBound — Supervisor Graph (pre-hoc structural analysis)", fontsize=12, pad=12)
+    plt.title("AgentBound — pre-hoc structural analysis", fontsize=12, pad=12)
     plt.figtext(0.5, 0.01, footer, ha="center", fontsize=9)
 
     plt.tight_layout(rect=(0,0.03,1,0.97))
 
     # Build names from the *input* JSON path
-    basename  = os.path.splitext(os.path.basename(graph_json))[0]
-    out_png   = os.path.join(OUT_DIR, f"{basename}.png")
-    out_report = os.path.join(OUT_DIR, f"{basename}_report.json")
+
+    # Determine base output directory.
+    # Default: current working directory. Otherwise: user-specified path.
+
+    base_dir = output_path if output_path else "."
+    out_dir = os.path.join(base_dir, OUT_DIR)
+    os.makedirs(out_dir, exist_ok=True)
+
+    basename   = os.path.splitext(os.path.basename(graph_json))[0]
+    out_png    = os.path.join(out_dir, f"{basename}.png")
+    out_report = os.path.join(out_dir, f"{basename}_report.json")
 
     plt.savefig(out_png, dpi=200)
     plt.close()
@@ -123,7 +149,11 @@ def main(graph_json, results_json=None, kind_map_json=None):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python agentbound.py <graph_json> [results_json] [kind_map_json]")
+        print("Usage: python agentbound.py <graph_json> [results_json] [kind_map_json] [output_path]")
         sys.exit(1)
-    main(sys.argv[1], sys.argv[2] if len(sys.argv)>2 else None,
-         sys.argv[3] if len(sys.argv)>3 else None)
+    main(
+            sys.argv[1],
+            sys.argv[2] if len(sys.argv) > 2 else None,
+            sys.argv[3] if len(sys.argv) > 3 else None,
+            sys.argv[4] if len(sys.argv) > 4 else None,
+        )

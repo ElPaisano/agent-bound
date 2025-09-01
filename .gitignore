@@ -3,8 +3,8 @@
 __pycache__/
 *.pyc
 
-# Ignore generated output everywhere
-out/
+# Ignore generated output everywhere (root or nested in examples)
+**/out/
 
 # Validation outputs
 validation/results/*

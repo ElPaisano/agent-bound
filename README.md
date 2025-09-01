@@ -15,7 +15,9 @@ By running AgentBound on your system design, you can:
 
 > **Do you want to see AgentBound in action ASAP?**
 >
-> The fastest way is the [Dummy LangGraph Supervisor demo](./examples/dummy_langraph_supervisor/HOW_TO_RUN.md). You’ll get visual diagrams, JSON reports, and a comparison diagram.
+> The fastest way is to run one of the included demos:
+> - [Customer Support Workflow demo](./examples/customer_support_agent/HOW_TO_RUN.md) — shows how small design changes (adding a Doc Filter or Validator) shift entropy.
+> - [Dummy LangGraph Supervisor demo](./examples/dummy_langgraph_supervisor/HOW_TO_RUN.md) — shows how the LangGraph Supervisor pattern changes entropy under different designs.
 
 ## Learn it
 
@@ -120,15 +122,13 @@ entropy = (G / max(1, G + D)) * coupling + 0.1 * gg
 
 ## Quickstart: Run the Demo
 
-The fastest way to try AgentBound is the [Dummy LangGraph Supervisor demo](./examples/dummy_langraph_supervisor/HOW_TO_RUN.md).
+Two demos are included:
 
-The demo will:
+1. [Customer Support Workflow](./examples/customer_support_agent/HOW_TO_RUN.md)  
+   Three variants of a customer support pipeline. See how risky LLM-to-LLM edges raise entropy and how Doc Filters/Validators change outcomes.
 
-1. Generate two versions of a simple multi-agent LangGraph Supervisor.
-2. Analyze each version individually.
-3. Compare both versions side by side.
-
-You’ll get visual diagrams, JSON reports, and a comparison diagram.
+2. [Dummy LangGraph Supervisor](./examples/dummy_langgraph_supervisor/HOW_TO_RUN.md)  
+   Two variants of LangGraph’s Supervisor pattern. Compare how additional deterministic anchors shift entropy from Very High → Moderate.
 
 ## General setup
 

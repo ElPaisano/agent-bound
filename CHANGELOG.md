@@ -5,17 +5,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
-
 ## [Unreleased]
-
 ### Added
-- Placeholder for upcoming features
+- Placeholder
+### Changed
+- Placeholder
+### Fixed
+- Placeholder
+
+---
+
+## [v0.2.0] - 2025-09-01
+### Added
+- **Customer Support Workflow demo** (`examples/customer_support_agent/`), including:
+  - Three variants (A = Baseline, B = Doc Filter, C = Post-Summarizer Validator)
+  - Input graphs + kind maps under `/inputs/`
+  - Reference outputs (JSON reports + PNGs) under `/artifacts/`
+  - `HOW_TO_RUN.md` walkthrough with metrics and interpretation
+- Optional CLI argument to `agentbound.py` for **custom output location**  
+  (defaults to `./out/`, can be overridden to any path)
 
 ### Changed
-- Placeholder for tweaks
+- **README.md**: surfaced both demos in Quickstart and intro section  
+  (Customer Support Workflow + Dummy LangGraph Supervisor)
+- **agentbound.py**:
+  - Normalized empty-string args (`""` → treated as `None`)
+  - Added warnings for mismatched `kind_map` IDs  
+  - Slight refactor for cleaner node-kind inference and reporting
+- Updated `.gitignore` to ignore all nested `out/` folders (`**/out/`), so demo run outputs don’t show up as untracked
 
 ### Fixed
-- Placeholder for bug fixes
+- Kind map application now consistently respects node IDs,  
+  preventing generative nodes from being misclassified as deterministic
 
 ---
 
