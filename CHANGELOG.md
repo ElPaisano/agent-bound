@@ -26,13 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (defaults to `./out/`, can be overridden to any path)
 
 ### Changed
-- **README.md**: surfaced both demos in Quickstart and intro section  
-  (Customer Support Workflow + Dummy LangGraph Supervisor)
+- **README.md**: 
+    - Surfaced both demos in Quickstart and intro section  (Customer Support Workflow + Dummy LangGraph Supervisor)
+    - Document optional custom output location 
 - **agentbound.py**:
   - Normalized empty-string args (`""` → treated as `None`)
   - Added warnings for mismatched `kind_map` IDs  
   - Slight refactor for cleaner node-kind inference and reporting
 - Updated `.gitignore` to ignore all nested `out/` folders (`**/out/`), so demo run outputs don’t show up as untracked
+- Updated `.gitignore` to exclude all nested `out/` folders, preventing demo run outputs from appearing as untracked files
+
 
 ### Fixed
 - Kind map application now consistently respects node IDs,  

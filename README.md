@@ -156,7 +156,13 @@ Two demos are included:
    pip install -r requirements.txt
    ```
 
-5. [Analyze a single graph](#analyze-a-single-graph) and/or [compare two graphs](#compare-two-graphs).
+5. The basic usage pattern is:
+   
+   ```bash
+   python agentbound.py <graph_json> [results_json] [kind_map_json] [output_path]
+   ```
+
+   Next, learn how to [analyze a single graph](#analyze-a-single-graph) and/or [compare two graphs](#compare-two-graphs).
 
 ## Analyze a single graph
 
@@ -165,6 +171,13 @@ python agentbound.py path/to/graph.json
 ```
 
 Outputs: PNG diagram + JSON metrics.
+
+> **(Optional) Specify an output location**
+>
+> By default, output is written to `agent-bound\out`. 
+> To write the output to a custom location, specify the optional `[output_path]`. 
+> 
+> For example, `python agentbound.py path/to/graph.json "" path/to/kind_map.json /examples/customer_support_agent/out` will create all outputs in `/examples/customer_support_agent/out`.
 
 Next, learn how to [interpret single graph analysis](#single-graph-analysis).
 
