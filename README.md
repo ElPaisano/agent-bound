@@ -13,11 +13,12 @@ By running AgentBound on your system design, you can:
 > The [`validation/`](validation/) directory contains experiments showing that AgentBound’s entropy scores track real brittleness in lightweight simulation tests.  
 > See [`VALIDATION.md`](validation/VALIDATION.md) for full details.
 
-> **Do you want to see AgentBound in action ASAP?**
->
-> The fastest way is to run one of the included demos:
-> - [Customer Support Workflow demo](./examples/customer_support_agent/HOW_TO_RUN.md) — shows how small design changes (adding a Doc Filter or Validator) shift entropy.
-> - [Dummy LangGraph Supervisor demo](./examples/dummy_langgraph_supervisor/HOW_TO_RUN.md) — shows how the LangGraph Supervisor pattern changes entropy under different designs.
+## Demos
+
+Run one of the included demos to see AgentBound in action:
+
+- [Customer Support Workflow demo](./examples/customer_support_agent/HOW_TO_RUN.md) - shows how small design changes (adding a Doc Filter or Validator) shift entropy.
+- [Dummy LangGraph Supervisor demo](./examples/dummy_langgraph_supervisor/HOW_TO_RUN.md) - shows how the LangGraph Supervisor pattern changes entropy under different designs.
 
 ## Learn it
 
@@ -31,6 +32,7 @@ Learn more about [agentic entropy](#what-is-agentic-entropy), [how AgentBound sc
 
 ## Table of Contents
 
+* [Demos](#demos)
 * [Learn it](#learn-it)
   * [What is agentic entropy?](#what-is-agentic-entropy)
   * [What AgentBound does and does not claim](#what-agentbound-does-and-does-not-claim)
