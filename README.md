@@ -20,6 +20,8 @@ Run one of the included demos to see AgentBound in action:
 - [Customer Support Workflow demo](./examples/customer_support_agent/HOW_TO_RUN.md) - shows how small design changes (adding a Doc Filter or Validator) shift entropy.
 - [Dummy LangGraph Supervisor demo](./examples/dummy_langgraph_supervisor/HOW_TO_RUN.md) - shows how the LangGraph Supervisor pattern changes entropy under different designs.
 
+Alternatively, [view and interpret example output](#interpret-agentbound-output).
+
 ## Learn it
 
 Learn more about [agentic entropy](#what-is-agentic-entropy), [how AgentBound scores a graph](#how-agentbound-scores-a-graph), and [what AgentBound does and doesn't claim](#what-agentbound-does-and-does-not-claim).
