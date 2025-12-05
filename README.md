@@ -266,7 +266,7 @@ For full details and usage, see [`validation/VALIDATION.md`](validation/VALIDATI
 
 ## Project status
 
-This repository contains an early prototype exploration of AgentBound concepts. The theory, metrics, and implementation have evolved significantly since this initial work. For current research status, please contact [your email]
+This repository contains an early prototype exploration of AgentBound concepts. The theory, metrics, and implementation have evolved significantly since this initial work. For current research status, please contact the author.
 
 ## Getting help
 
