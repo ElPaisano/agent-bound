@@ -1,5 +1,7 @@
 # AgentBound
 
+> This repository contains an early prototype exploration of AgentBound concepts. The theory, metrics, and implementation have evolved significantly since this initial work. For current research status, please contact the author.
+
 AgentBound is a design-time static analysis tool for AI agent systems. Think of it like a linter for agent graphs: it computes an _agentic entropy_ score from an agent architecture and flags risky patterns such as long generative-to-generative chains, loops, and missing validators.
 
 By running AgentBound on your system design, you can:
@@ -264,13 +266,7 @@ For full details and usage, see [`validation/VALIDATION.md`](validation/VALIDATI
 
 ## Project status
 
-AgentBound V0 supports:
-
-* Parsing LangGraph JSON
-* Visual + JSON reports
-* Side-by-side design comparisons
-
-Future work: support more frameworks, richer visualizations, CI/CD integration.
+This repository contains an early prototype exploration of AgentBound concepts. The theory, metrics, and implementation have evolved significantly since this initial work. For current research status, please contact [your email]
 
 ## Getting help
 
