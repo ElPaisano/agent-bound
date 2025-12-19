@@ -1,13 +1,19 @@
 # AgentBound
 
-> **Status Update — December 10 2025**
+> **Status Update & Contact Information**
 >
-> This repository contains the early exploratory prototype of AgentBound.
-The theory, metrics, and implementation have evolved substantially since this
-initial work. A more formal metric suite and updated theoretical framework
-is currently under active development in a private workspace and will be
-published after initial validation. For current research status, please contact
-the author.
+> This repository contains an early, exploratory prototype of AgentBound and is
+> shared for noncommercial research and evaluation purposes only.
+>
+> The theory, metrics, and implementation have evolved substantially since this
+> initial work. A more formal metric suite and updated theoretical framework are
+> currently under active development in a private workspace and will be published
+> after initial validation.
+>
+> This repository is **not** the current or complete representation of the
+> AgentBound framework. Commercial use or derivative tooling requires explicit
+> permission from the author. For current research status, collaboration inquiries, or licensing discussions,
+> please contact: `elpaisano.research@proton.me`.
 
 AgentBound is a design-time static analysis tool for AI agent systems. Think of it like a linter for agent graphs: it computes an _agentic entropy_ score from an agent architecture and flags risky patterns such as long generative-to-generative chains, loops, and missing validators.
 
@@ -273,12 +279,13 @@ For full details and usage, see [`validation/VALIDATION.md`](validation/VALIDATI
 
 ## Project status
 
-This repository contains the early exploratory prototype of AgentBound.
-The theory, metrics, and implementation have evolved substantially since this
-initial work. A more formal metric suite and updated theoretical framework
-is currently under active development in a private workspace and will be
-published after initial validation. For current research status, please contact
-the author.
+This repository contains an early, exploratory prototype of AgentBound and is shared for noncommercial research and evaluation purposes only.
+
+The theory, metrics, and implementation have evolved substantially since this initial work. A more formal metric suite and updated theoretical framework are currently under active development in a private workspace and will be published after initial validation.
+
+This repository is **not** the current or complete representation of the AgentBound framework. Commercial use or derivative tooling requires explicit permission from the author. For current research status, collaboration inquiries, or licensing discussions, please contact: `elpaisano.research@proton.me`.
+
+> Please use GitHub Issues only for questions or feedback specific to this public prototype. Private inquiries should be directed to the email above.
 
 ## Getting help
 
